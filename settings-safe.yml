@@ -8,9 +8,6 @@ use_default_settings:
       - bing
       - bing images
       - bing videos
-      - duckduckgo
-      - duckduckgo images
-      - duckduckgo videos
       - wikipedia
       - wikidata
       - wikicommons.images
@@ -75,3 +72,8 @@ preferences:
     - method
     - image_proxy
     - engines
+
+# Bing web search is disabled by default in SearXNG -- explicitly enable it
+engines:
+  - name: bing
+    disabled: false
