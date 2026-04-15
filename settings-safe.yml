@@ -1,0 +1,77 @@
+use_default_settings:
+  engines:
+    keep_only:
+      - google
+      - google images
+      - google videos
+      - google scholar
+      - bing
+      - bing images
+      - bing videos
+      - duckduckgo
+      - duckduckgo images
+      - duckduckgo videos
+      - wikipedia
+      - wikidata
+      - wikicommons.images
+      - wikicommons.videos
+      - stackoverflow
+      - askubuntu
+      - superuser
+      - mdn
+      - gentoo
+      - arch linux wiki
+      - openairedatasets
+      - openairepublications
+      - semantic scholar
+      - pubmed
+
+general:
+  debug: false
+  instance_name: "Safe Search"
+  privacypolicy_url: false
+  donation_url: false
+  contact_url: false
+  enable_metrics: true
+
+search:
+  safe_search: 2
+  autocomplete: "google"
+  default_lang: "en"
+
+categories_as_tabs:
+  general:
+  images:
+  videos:
+  science:
+  it:
+
+server:
+  base_url: "http://safesearch.dyob.ca/"
+  port: 8889
+  bind_address: "0.0.0.0"
+  secret_key: "CHANGE_ME_generate_with_openssl_rand_hex_32"
+  limiter: false
+  image_proxy: true
+  public_instance: false
+
+ui:
+  static_use_hash: true
+  default_theme: simple
+  theme_args:
+    simple_style: auto
+
+enabled_plugins:
+  - Hash plugin
+  - Tracker URL remover
+
+preferences:
+  lock:
+    - safesearch
+    - categories
+    - language
+    - locale
+    - autocomplete
+    - method
+    - image_proxy
+    - engines
