@@ -76,6 +76,11 @@ preferences:
     - engines
 
 # Bing web search is disabled by default in SearXNG -- explicitly enable it
+# Bing/Google images lose their category in keep_only mode -- reassign them
 engines:
   - name: bing
     disabled: false
+  - name: bing images
+    categories: [images]
+  - name: google images
+    categories: [images]
