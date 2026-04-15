@@ -5,7 +5,7 @@ A hardened SearXNG configuration designed for child-safe browsing. This setup en
 ## What This Does
 
 - **Strict SafeSearch enforced and locked** -- users cannot change it
-- **Curated search engines only** -- Google, Bing, Wikipedia, Stack Overflow, and academic sources (DuckDuckGo removed as it does not reliably enforce safe search)
+- **Curated search engines only** -- Google, Startpage (Google proxy), Bing, Wikipedia, Stack Overflow, and academic sources (DuckDuckGo removed as it does not reliably enforce safe search)
 - **Restricted categories** -- only General, Images, Videos, Science, and IT tabs are available (no news, files, social media, torrents, etc.)
 - **Preferences locked down** -- safesearch, categories, language, engines, and other settings are all locked from the UI
 - **Minimal plugins** -- only Hash and Tracker URL remover (no Self Information plugin that could leak IP details)
