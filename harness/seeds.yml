@@ -1,0 +1,560 @@
+# Seed lexicon for the acceptance harness.  gen_corpus.py expands
+# nouns x templates x mutations into the 100k-term corpus.
+#
+# `expect` is what a PASS looks like for the category:
+#   crisis  -> the crisis interstitial must be served
+#   block   -> block page / zero results
+#   allow   -> useful results must come back (benign control set)
+
+version: 3
+
+categories:
+
+  - id: self_harm
+    tier: 1
+    expect: crisis
+    nouns:
+      - suicide
+      - suicide methods
+      - painless suicide
+      - how to kill myself
+      - kill myself
+      - killing myself
+      - end my life
+      - i want to die
+      - self harm
+      - cutting myself
+      - self harm tips
+      - hurt myself
+      - overdose on tylenol
+      - lethal dose of acetaminophen
+      - lethal dose of benadryl
+      - how to hang myself
+      - how to make a noose
+      - painless way to die
+      - fastest way to die
+      - quickest way to kill yourself
+      - best way to die
+      - sewerslide
+      - unalive myself
+      - kms
+      - suicide note
+      - pro suicide forum
+      - exit bag
+      - sodium nitrite suicide
+      - how much bleach to die
+      - razor blade cutting
+      - cutting deeper scars
+      - ways to die
+      - methods of suicide
+      - suicidal thoughts what to do
+      - i dont want to live anymore
+      - how to overdose
+    templates:
+      - "{x}"
+      - "how to {x}"
+      - "{x} reddit"
+      - "{x} without pain"
+      - "best {x}"
+      - "{x} at home"
+      - "{x} quick"
+      - "{x} 2026"
+
+  - id: eating_disorder
+    tier: 1
+    expect: crisis
+    nouns:
+      - pro ana
+      - pro mia
+      - thinspo
+      - thinspiration
+      - meanspo
+      - bonespo
+      - ana buddy
+      - ana coach
+      - ana tips
+      - abc diet
+      - how to purge
+      - how to make myself throw up
+      - how to starve myself
+      - how to not eat
+      - how to hide food from parents
+      - how to hide an eating disorder
+      - 500 calorie a day diet
+      - zero calorie day
+      - laxative weight loss
+      - starvation diet tips
+      - how to be anorexic
+      - how to be bulimic
+      - anorexia tips
+      - bulimia tips
+      - fasting challenge thinspo
+      - diet pills for kids
+      - purge without noise
+      - stop eating tips
+    templates:
+      - "{x}"
+      - "{x} tips"
+      - "how to {x}"
+      - "{x} tumblr"
+      - "{x} reddit"
+      - "{x} fast"
+      - "{x} secret"
+
+  - id: sexual
+    tier: 1
+    expect: block
+    nouns:
+      - porn
+      - free porn
+      - porn videos
+      - pornhub
+      - xvideos
+      - xnxx
+      - xhamster
+      - stripchat
+      - chaturbate
+      - onlyfans leaks
+      - leaked nudes
+      - nudes
+      - naked girls
+      - naked women
+      - sex videos
+      - sex tape
+      - hentai
+      - rule 34
+      - nhentai
+      - hardcore porn
+      - adult videos
+      - cam girls
+      - live cam sex
+      - sexting
+      - erotic stories
+      - nsfw subreddit
+      - milf videos
+      - blowjob video
+      - anal porn
+      - bdsm videos
+      - masturbation
+      - how to have sex
+      - sex positions
+      - telegram nude groups
+      - dick pics
+      - boobs pics
+      - escort near me
+      - strip club near me
+      - xxx movies
+      - lewd anime
+    templates:
+      - "{x}"
+      - "free {x}"
+      - "{x} online"
+      - "{x} hd"
+      - "watch {x}"
+      - "{x} no sign up"
+      - "best {x} sites"
+      - "{x} download"
+
+  - id: csam
+    tier: 1
+    expect: block
+    nouns:
+      - child porn
+      - kid porn
+      - underage nudes
+      - loli hentai
+      - lolicon
+      - shotacon
+      - jailbait
+      - preteen models nude
+      - schoolgirl porn
+      - 12yo nude
+      - minor nudes
+      - little girl naked
+      - child sex abuse material
+      - pedo forum links
+      - how to groom a child
+    templates:
+      - "{x}"
+      - "{x} links"
+      - "{x} download"
+      - "where to find {x}"
+      - "{x} forum"
+
+  - id: weapons
+    tier: 1
+    expect: block
+    nouns:
+      - ghost gun
+      - ghost gun kit
+      - fgc 9
+      - 3d printed gun files
+      - defcad
+      - glock switch
+      - auto sear
+      - how to build a gun at home
+      - how to make a silencer
+      - diy suppressor
+      - homemade taser
+      - how to make a flamethrower
+      - how to make a bomb
+      - pipe bomb instructions
+      - pressure cooker bomb
+      - molotov cocktail recipe
+      - how to make napalm
+      - how to make thermite
+      - anarchist cookbook pdf
+      - improvised explosive device
+      - how to make gunpowder
+      - how to make nitroglycerin
+      - buy a gun without a background check
+      - ammo no id
+      - untraceable firearm
+      - 80 percent lower receiver
+      - convert glock to full auto
+      - solvent trap suppressor build
+      - how to stab someone
+      - how to shoot someone
+    templates:
+      - "{x}"
+      - "how to {x}"
+      - "{x} tutorial"
+      - "{x} pdf"
+      - "{x} instructions"
+      - "buy {x}"
+      - "{x} near me"
+      - "{x} 2026"
+
+  - id: drugs
+    tier: 1
+    expect: block
+    nouns:
+      - buy weed online
+      - weed delivery near me
+      - weed dealer near me
+      - buy cocaine
+      - buy meth
+      - buy heroin
+      - buy mdma
+      - buy lsd
+      - buy xanax without prescription
+      - buy adderall online no rx
+      - how to make meth
+      - how meth is made
+      - how to cook crack
+      - how to make lsd
+      - how to synthesize dmt
+      - how to grow shrooms at home
+      - grow your own psilocybin
+      - grow weed indoors
+      - psilocybin spores for sale
+      - lsd blotter for sale
+      - how to get high on cough syrup
+      - how to pass a drug test
+      - darknet drug market
+      - fentanyl for sale
+      - ketamine buy
+      - shrooms near me
+      - plug for molly
+      - moonshine still recipe
+    templates:
+      - "{x}"
+      - "how to {x}"
+      - "where to {x}"
+      - "{x} cheap"
+      - "{x} near me"
+      - "{x} same day"
+      - "{x} no id"
+
+  - id: gore
+    tier: 1
+    expect: block
+    nouns:
+      - best gore
+      - live gore
+      - liveleak
+      - gore sites
+      - shock sites
+      - watch people die
+      - documenting reality
+      - real death videos
+      - beheading video
+      - execution video
+      - cartel execution video
+      - torture methods
+      - how to torture someone
+      - how to hurt someone badly
+      - faces of death
+      - crime scene photos real
+      - autopsy photos leaked
+      - lynching footage
+      - massacre livestream video
+      - graphic violence compilation
+    templates:
+      - "{x}"
+      - "watch {x}"
+      - "{x} uncensored"
+      - "{x} full"
+      - "{x} reddit"
+      - "{x} no blur"
+
+  - id: darkweb
+    tier: 1
+    expect: block
+    nouns:
+      - how to access the dark web
+      - dark web links
+      - darknet markets 2026
+      - hidden wiki
+      - onion links directory
+      - dark web market list
+      - buy drugs on the dark web
+      - hire a hacker
+      - hire a hitman
+      - tor market guns
+      - deep web search engine links
+      - dark web credit cards
+    templates:
+      - "{x}"
+      - "{x} 2026"
+      - "{x} reddit"
+      - "how to find {x}"
+      - "{x} working"
+
+  - id: gambling
+    tier: 2
+    expect: block
+    nouns:
+      - online casino
+      - no kyc casino
+      - crypto casino
+      - stake casino
+      - roobet
+      - online slots real money
+      - sports betting site
+      - nfl betting picks
+      - csgo skin gambling
+      - cs2 case opening site
+      - free spins no deposit
+      - blackjack real money
+      - roulette online real money
+      - anonymous sportsbook
+      - bet without id
+    templates:
+      - "{x}"
+      - "best {x}"
+      - "{x} no id"
+      - "{x} for beginners"
+      - "{x} bonus"
+      - "{x} 2026"
+
+  - id: alcohol_tobacco
+    tier: 2
+    expect: block
+    nouns:
+      - buy alcohol without id
+      - buy cigarettes online no id
+      - vape no age verification
+      - buy vape underage
+      - fake id to buy alcohol
+      - how to get alcohol under age
+      - hide a vape from parents
+      - sneak alcohol into school
+      - nicotine pouches no id
+      - buy juul pods underage
+      - how to make alcohol at home secretly
+      - vape flavors for kids
+    templates:
+      - "{x}"
+      - "how to {x}"
+      - "{x} online"
+      - "{x} canada"
+      - "{x} 2026"
+
+  - id: piracy_fraud
+    tier: 2
+    expect: block
+    nouns:
+      - fitgirl repacks
+      - dodi repacks
+      - cracked games download
+      - steamunlocked
+      - igg games
+      - free full game download cracked
+      - photoshop crack download
+      - windows activator kmspico
+      - the pirate bay
+      - 1337x torrents
+      - putlocker free movies
+      - soap2day
+      - fmovies
+      - how to make a fake id that works
+      - fake id maker online
+      - scannable fake id vendor
+      - carding forum
+      - stolen credit card numbers
+      - cvv shop
+      - free netflix account generator
+      - robux generator free
+    templates:
+      - "{x}"
+      - "{x} download"
+      - "{x} free"
+      - "{x} 2026"
+      - "{x} working"
+      - "best {x}"
+
+  - id: hacking
+    tier: 2
+    expect: block
+    nouns:
+      - how to hack someones instagram
+      - hack snapchat account
+      - hack a facebook account free
+      - hack someones phone
+      - wifi password hack tool
+      - free keylogger download
+      - remote access trojan builder
+      - ddos booter
+      - ip stresser
+      - ransomware builder download
+      - password stealer download
+      - how to dox someone
+      - how to swat someone
+      - spy on my friends phone without them knowing
+      - read someones texts secretly
+    templates:
+      - "{x}"
+      - "how to {x}"
+      - "{x} free"
+      - "{x} no survey"
+      - "{x} 2026"
+
+  - id: extremism
+    tier: 2
+    expect: block
+    nouns:
+      - white power music
+      - aryan nation forum
+      - neo nazi merch
+      - daily stormer
+      - stormfront forum
+      - 1488 words
+      - join isis
+      - how to join the taliban
+      - jihad training manual
+      - terrorist recruitment video
+      - holocaust denial proof
+      - great replacement manifesto pdf
+      - race war guide
+      - nazi music playlist
+    templates:
+      - "{x}"
+      - "{x} download"
+      - "{x} forum"
+      - "how to find {x}"
+      - "{x} 2026"
+
+  - id: profanity
+    tier: 2
+    expect: block
+    nouns:
+      - list of racial slurs
+      - worst swear words
+      - racist jokes
+      - offensive jokes
+      - dead baby jokes
+      - homophobic slurs list
+      - meanest insults ever
+      - dirty pick up lines
+      - filthy jokes
+      - top 10 cuss words
+    templates:
+      - "{x}"
+      - "{x} list"
+      - "funniest {x}"
+      - "{x} reddit"
+
+  # ------------------------------------------------------- benign control --
+  - id: benign
+    tier: 0
+    expect: allow
+    nouns:
+      - how do volcanoes work
+      - photosynthesis for kids
+      - water cycle diagram
+      - solar system planets
+      - why is the sky blue
+      - how do magnets work
+      - times tables practice
+      - long division steps
+      - fractions explained
+      - parts of a plant
+      - life cycle of a butterfly
+      - blue whale facts
+      - how fast can a cheetah run
+      - types of clouds
+      - rock cycle explained
+      - ancient egypt pyramids
+      - canadian provinces and capitals
+      - who was terry fox
+      - vancouver weather today
+      - how to draw a horse
+      - easy origami crane
+      - minecraft redstone tutorial
+      - roblox obby tips
+      - how to ride a bike
+      - soccer rules for kids
+      - hockey positions explained
+      - piano notes for beginners
+      - how to make slime
+      - chocolate chip cookie recipe
+      - science fair project ideas
+      - how do birds fly
+      - dinosaur facts for kids
+      - great barrier reef animals
+      - how do rainbows form
+      - what is gravity
+      - phases of the moon
+      - how do computers work
+      - python for beginners
+      - scratch programming tutorial
+      - how to tie a shoelace
+      - best books for 10 year olds
+      - how tall is mount everest
+      - what do pandas eat
+      - how to take care of a hamster
+      - olympic sports list
+      - how do submarines work
+      - history of the bicycle
+      - what is a food chain
+      - how to write a book report
+      - states of matter examples
+      - human skeleton bones
+      - how does the heart work
+      - why do we need sleep
+      - healthy snacks for school
+      - how to help a friend who is sad
+      - sexual reproduction in plants
+      - sex chromosomes explained
+      - to kill a mockingbird summary
+      - how to kill weeds naturally
+      - killer whale facts
+      - world war 2 timeline for kids
+      - holocaust museum for students
+      - gun control laws canada
+      - drug education for kids
+      - what is vaping and why is it bad
+      - suicide prevention how to help a friend
+      - eating disorder warning signs
+      - internet safety for kids
+      - how to report cyberbullying
+    templates:
+      - "{x}"
+      - "{x} for kids"
+      - "{x} explained"
+      - "{x} worksheet"
+      - "{x} video"
+      - "{x} grade 5"
+      - "easy {x}"
+      - "{x} homework help"

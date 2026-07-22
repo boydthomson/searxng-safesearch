@@ -1,0 +1,44 @@
+# Layer 3 / Layer 4 replay fixtures: engine results the filter must drop, and
+# benign results it must keep.  Format: one SearXNG-shaped result per line plus
+# "expect": "drop" | "keep".
+{"expect":"drop","url":"https://www.pornhub.com/video/search?search=x","title":"Free Porn Videos","content":"Watch free porn videos"}
+{"expect":"drop","url":"https://m.xvideos.com/","title":"XVIDEOS.COM","content":"Free porn tube"}
+{"expect":"drop","url":"https://xnxx.tv/best","title":"XNXX","content":"Free sex videos"}
+{"expect":"drop","url":"https://stripchat.com/girls","title":"Live Cams","content":"Free live cam girls"}
+{"expect":"drop","url":"https://rule34.xxx/index.php","title":"Rule 34","content":"hentai images"}
+{"expect":"drop","url":"https://nhentai.net/g/1","title":"nhentai","content":"doujinshi"}
+{"expect":"drop","url":"https://coomer.su/onlyfans","title":"leaked onlyfans","content":"leaked nudes"}
+{"expect":"drop","url":"https://example-newdomain-xyz.com/free-porn-videos-hd","title":"Free HD Porn Tube","content":"Thousands of free porn videos in HD"}
+{"expect":"drop","url":"https://livegore.com/watch","title":"Live Gore","content":"real death videos"}
+{"expect":"drop","url":"https://www.liveleak.com/view","title":"LiveLeak","content":"graphic footage"}
+{"expect":"drop","url":"https://some-random-host.ru/beheading-video-uncensored","title":"Beheading video full","content":"real execution footage uncensored"}
+{"expect":"drop","url":"https://defcad.com/library","title":"DEFCAD","content":"3d printed gun files"}
+{"expect":"drop","url":"https://ghostguns.com/kits","title":"Ghost Gun Kits","content":"build your own untraceable firearm"}
+{"expect":"drop","url":"https://weird-forum.net/how-to-make-a-silencer-at-home","title":"How to make a silencer","content":"DIY suppressor build guide"}
+{"expect":"drop","url":"https://sketchy.example/how-to-make-meth-at-home","title":"How to make meth","content":"methamphetamine synthesis guide"}
+{"expect":"drop","url":"https://buyweedonline.ca/shop","title":"Buy Weed Online","content":"same day weed delivery"}
+{"expect":"drop","url":"https://fitgirl-repacks.site/game","title":"FitGirl Repacks","content":"cracked game repack download"}
+{"expect":"drop","url":"https://cracked-games.org/latest","title":"Cracked Games","content":"free full version download"}
+{"expect":"drop","url":"https://idgod.ph/","title":"ID God","content":"scannable fake id maker that works"}
+{"expect":"drop","url":"https://stake.com/casino","title":"Stake Casino","content":"crypto casino and sportsbook"}
+{"expect":"drop","url":"https://some-casino.click/no-kyc","title":"No KYC Casino","content":"anonymous online casino no id"}
+{"expect":"drop","url":"https://darknetlive.com/markets","title":"Darknet markets 2026","content":"dark web market list"}
+{"expect":"drop","url":"https://thehiddenwiki.org/","title":"Hidden Wiki","content":"onion links directory"}
+{"expect":"drop","url":"https://dailystormer.in/article","title":"Daily Stormer","content":"neo nazi news"}
+{"expect":"drop","url":"https://random-host.biz/white-power-music-playlist","title":"White power music playlist","content":"aryan pride bands"}
+{"expect":"drop","url":"https://sketch.example/free-keylogger-download","title":"Free keylogger download","content":"keylogger builder free download"}
+{"expect":"drop","url":"https://evil.example/list-of-racial-slurs","title":"List of racial slurs","content":"complete list of racial slurs and insults"}
+{"expect":"drop","url":"https://shady.example/hack-someones-instagram-free","title":"Hack someones instagram","content":"instagram password hack tool free online"}
+{"expect":"drop","url":"https://anything.xxx/","title":"Adult","content":"adult site"}
+{"expect":"keep","url":"https://en.wikipedia.org/wiki/Volcano","title":"Volcano","content":"A volcano is a rupture in the crust of a planet."}
+{"expect":"keep","url":"https://kidshelpphone.ca/get-support","title":"Get Support | Kids Help Phone","content":"Talk to a counsellor about suicide, self-harm, or anything else."}
+{"expect":"keep","url":"https://www.canada.ca/en/public-health/services/suicide-prevention.html","title":"Suicide prevention","content":"If you are thinking about suicide, help is available."}
+{"expect":"keep","url":"https://nedic.ca/","title":"NEDIC","content":"National Eating Disorder Information Centre helpline and support"}
+{"expect":"keep","url":"https://www.ushmm.org/learn","title":"Learn about the Holocaust","content":"Holocaust history and education resources"}
+{"expect":"keep","url":"https://www.khanacademy.org/science/biology","title":"Biology | Khan Academy","content":"Learn about sexual reproduction in plants and animals."}
+{"expect":"keep","url":"https://en.wikipedia.org/wiki/To_Kill_a_Mockingbird","title":"To Kill a Mockingbird","content":"A 1960 novel by Harper Lee."}
+{"expect":"keep","url":"https://kids.nationalgeographic.com/animals/mammals/facts/killer-whale","title":"Killer whale facts","content":"Killer whales, or orcas, are the largest dolphins."}
+{"expect":"keep","url":"https://www.cbc.ca/news/canada","title":"Canada News","content":"The latest Canadian news headlines."}
+{"expect":"keep","url":"https://stackoverflow.com/questions/1","title":"How to kill a process in Linux","content":"Use kill -9 with the process id."}
+{"expect":"keep","url":"https://www.ducksters.com/science/photosynthesis.php","title":"Photosynthesis for Kids","content":"How plants make food from sunlight."}
+{"expect":"keep","url":"https://scratch.mit.edu/projects/editor","title":"Scratch","content":"Create stories, games, and animations."}

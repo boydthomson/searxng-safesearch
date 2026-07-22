@@ -1,0 +1,7 @@
+# generated / large
+reports/
+data/cache/
+data/blocked-hosts.txt
+harness/corpus.jsonl
+__pycache__/
+*.pyc

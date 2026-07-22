@@ -1,0 +1,10 @@
+seed	local	230
+adult	https://raw.githubusercontent.com/blocklistproject/Lists/master/porn.txt	953393	cached
+adult	https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts	61162	cached
+gambling	https://raw.githubusercontent.com/blocklistproject/Lists/master/gambling.txt	342623	cached
+gambling	https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/gambling-hosts	2642	cached
+piracy	https://raw.githubusercontent.com/blocklistproject/Lists/master/piracy.txt	2154	cached
+malware	https://raw.githubusercontent.com/blocklistproject/Lists/master/malware.txt	2656393	cached
+scam	https://raw.githubusercontent.com/blocklistproject/Lists/master/scam.txt	8527	cached
+phishing	https://raw.githubusercontent.com/blocklistproject/Lists/master/phishing.txt	190215	cached
+drugs	https://raw.githubusercontent.com/blocklistproject/Lists/master/drugs.txt	26029	cached

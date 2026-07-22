@@ -1,0 +1,587 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Category lexicons for the the safe-search instance child-safety classifier.
+#
+#   tier    1 = zero tolerance (must never leak), 2 = strict
+#   action  crisis | block          (what L2 does with a matching *query*)
+#   safe    regexes that VETO a hit for this category (benign/clinical context)
+#   any     regexes; a match on any normalised query variant is a hit
+#   combo   {verbs, nouns}; hit when a verb AND a noun both appear
+#   squeeze tokens matched against the separator-free form; must be long and
+#           unambiguous, because "sex" would otherwise fire inside "essex"
+#
+# Regexes run against lowercased, accent-folded, de-leeted variants, so write
+# them in plain lowercase ASCII.
+
+version: 3
+
+categories:
+
+  # ---------------------------------------------------------------- tier 1 --
+  - id: self_harm
+    tier: 1
+    action: crisis
+    label: Self-harm and suicide
+    safe:
+      - '\bkill (weeds?|grass|bugs?|ants?|germs?|bacteria|mold|a process|time|the lights?)\b'
+      - '\bkill(er)? (whale|bee|virus|switch|app|process)\b'
+      - '\bto kill a mockingbird\b'
+      - '\bkilling eve\b'
+      - '\b(kills?|killed) in (battle|action|war)\b'
+      - '\bsuicide squad\b'
+      - '\bsuicide (prevention|hotline|help ?line|awareness|crisis line)\b'
+      - '\b\d+ ?km\b'
+      - '\bkms? (to|in|per|from|away|apart|long|north|south|east|west|by car|on foot)\b'
+      - '\bkill \w+ (naturally|organically|safely|without chemicals)\b'
+      - '\bkill (\w+ )?(weeds?|wees|grass|dandelions?|moss|mould|mold|fungus|aphids?|slugs?) \w*\b'
+    any:
+      - '\bkill (my|your|him|her|them|one)\s?sel(f|ves)\b'
+      - '\b(end|ending|take|taking) (my|your|his|her|their|ones) (own )?life\b'
+      - '\bsuicid(e|al)\b'
+      - '\bself ?harm(ing)?\b'
+      - '\b(cut|cutting|burn|burning) (my|your|him|her|them|one)\s?sel(f|ves)\b'
+      - '\bhow (to|do i|can i) (die|kill|hang|drown|suffocate|overdose)\b'
+      - '\b(painless|quickest|fastest|easiest|best) way to (die|go|kill)\b'
+      - '\bwant to die\b'
+      - '\b(dont|do not|no reason to) want to (live|be alive|exist)\b'
+      - '\bhow much .{0,24}(tylenol|acetaminophen|paracetamol|advil|ibuprofen|bleach|aspirin|benadryl|insulin) (to|would|will) (kill|die|be lethal|overdose)\b'
+      - '\blethal dose\b'
+      - '\b(hanging|noose) (knot|tutorial|how to)\b'
+      - '\b(razor|blade) (to|for) (cut|cutting)\b'
+      - '\b(cutting|self injury) (scars?|tips?|deeper|blades?)\b'
+      - '\bsew?er?slide\b'
+      - '\bunalive (my|your|him|her|them)\s?sel(f|ves)\b'
+      - '\bunalive myself\b'
+      - '\bkms\b'
+      - '\b(pro|method) (suicide|ana) (forum|site|board)\b'
+      - '\bexit bag\b'
+      - '\bsodium nitrite (dose|purchase|suicide|buy)\b'
+      - '\bhow to (make|tie) a noose\b'
+      - '\b(hurt|harm|injure|damage|starve|poison|drown|suffocate|choke) (my|your|him|her|them|one)\s?sel(f|ves)\b'
+      - '\bover ?dos(e|ing) (on|with)\b'
+      - '\b(razor|blade|knife|scissors) (blade )?(cut|cutting|cuts)\b'
+      - '\b(cut|cutting|burn|burning|scratch|scratching) (deeper|scars?|marks?|tips?|blades?|tools?)\b'
+      - '\b(end|ending) it all\b'
+      - '\bunaliv(e|ed|ing)\b'
+      - '\b(ways?|methods?|tips?|guide|how) .{0,16}(to )?\b(self ?harm|kill (my|your)\s?self|die|suicide)\b'
+      - '\bhow (long|much) .{0,20}(to )?(bleed out|die|drown|suffocate)\b'
+      - '\bnobody (would|will) (miss|care about) me\b'
+      - '\bpainless (death|way|method|exit)\b'
+      - '\b(hang|drown|suffocate|starve) (my|your)\s?self\b'
+      - '\b(off|offing) (my|your|him|her|them)\s?sel(f|ves)\b'
+      - '\bself deletion\b'
+      - '\bunaliv\w*\b'
+      - '\b(dont|do not) want to (live|be alive|exist|wake up)\b'
+      - '\bsodium nitrite\b'
+    combo:
+      - verbs: ['\bhow to\b', '\bways? to\b', '\bmethods? (of|to|for)\b', '\bbest way\b']
+        nouns: ['\bdie\b', '\bdying\b', '\bdeath\b', '\boverdose\b', '\bod\b', '\bhang\b', '\bsuffocate\b', '\bbleed out\b']
+    squeeze:
+      - killmyself
+      - killingmyself
+      - selfharm
+      - suicidemethod
+      - suicidemethods
+      - howtodie
+      - wanttodie
+      - unalivemyself
+      - painlessdeath
+      - sewerslide
+
+  - id: eating_disorder
+    tier: 1
+    action: crisis
+    label: Eating disorders
+    safe:
+      - '\b(recovery|recovering|treatment|therapy|clinic|dietitian|nutritionist|warning signs|help (a )?(friend|someone)|what (is|are)|symptoms of|causes of)\b'
+      - '\bnational eating disorder\b'
+      - '\bhealthy (eating|diet|snacks?|breakfast|lunch|meals?)\b'
+    any:
+      - '\bpro ?(ana|mia)\b'
+      - '\bthin ?spo(ration)?\b'
+      - '\bmean ?spo\b'
+      - '\bbone ?spo\b'
+      - '\bana (buddy|coach|tips|rules|commandments)\b'
+      - '\b(how to|ways? to|tips? to) (purge|throw up|vomit|starve|not eat|stop eating|hide (food|eating))\b'
+      - '\bmake (my|your)\s?self (throw up|vomit|puke)\b'
+      - '\b(starvation|starving|fasting) (diet|challenge|tips|mode)\b'
+      - '\b(hide|hiding) (an )?(eating disorder|anorexia|bulimia)\b'
+      - '\b(calorie|caloric) (restriction|deficit) (extreme|500|abc)\b'
+      - '\babc diet\b'
+      - '\b(anorexi[ac]|bulimi[ac]) (tips|how to|guide|method)\b'
+      - '\bhow to (be|get|become) (anorexic|bulimic)\b'
+      - '\b(0|zero|100|300|500) calorie (a |per )?day\b'
+      - '\b\d{2,4} calories? (a|per|an)? ?day (diet|challenge|plan)?\b'
+      - '\bcalories? (a|per) day diet\b'
+      - '\bdiet pills? for (kids?|teens?|children)\b'
+      - '\blaxative (abuse|diet|weight loss)\b'
+      - '\bpurg(e|ing)\b.{0,24}\b(quiet|quietly|silent|silently|without noise|without sound|secretly|at school|hide)\b'
+      - '\b(stop|quit|avoid|skip) (eating|meals?|food)\b'
+      - '\b(skip|skipping) (breakfast|lunch|dinner|meals?) (to lose|for weight|tips)\b'
+      - '\b(not eating|eating nothing|empty stomach) (tips|challenge|for days|feels good)\b'
+      - '\bfeel (full|fuller) without (eating|food)\b'
+      - '\b(appetite|hunger) (suppress\w*|killer)\b'
+      - '\bwater fast(ing)? (weight|days|challenge)\b'
+      - '\bhow (many|much) calories to (lose|drop) \d+\b'
+      - '\b(goal|ugw|cw|gw) weight\b'
+    squeeze:
+      - proana
+      - promia
+      - thinspo
+      - thinspiration
+      - meanspo
+      - bonespo
+      - howtobeanorexic
+      - howtopurge
+
+  - id: sexual
+    tier: 1
+    action: block
+    label: Sexual content
+    safe:
+      - '\basexual\b'
+      - '\bsex(ual)? (chromosomes?|cells?|linked|reproduction|dimorphism|determination|selection)\b'
+      - '\bsex of (a|an|the|my)\b'
+      - '\b(opposite|same|biological|third) sex\b'
+      - '\bsex education\b'
+      - '\bmiddlesex|essex|sussex|wessex\b'
+      - '\b(water|gas|oil|roof|pipe|air|coolant|fuel|memory|data|news|information|intelligence|document) leaks?\b'
+      - '\bleaks? (in|from|under|around) (the|my|a)\b'
+      - '\b(fix|repair|stop|detect|find) (a |the )?leaks?\b'
+    any:
+      - '\bporn(o|ography|hub|site|star|tube|hd)?\b'
+      - '\bpron\b'
+      - '\bsex\b'
+      - '\b(secks|seggs|sekx|noods|nudez)\b'
+      - '\bxxx\b'
+      - '\bnsfw\b'
+      - '\bhentai\b'
+      - '\brule ?34\b'
+      - '\bdoujin(shi)?\b'
+      - '\becchi\b'
+      - '\bnudes?\b'
+      - '\bnaked (girls?|boys?|women|men|people|pics?|photos?)\b'
+      - '\bonly ?fans\b'
+      - '\bcam ?(girl|boy|site|show)s?\b'
+      - '\bstrip(per|tease|chat|club)\b'
+      - '\bescort (service|near me|agency)\b'
+      - '\bsex(y|ting|cam|chat|tape|video|shop|toy|doll|position|scene|worker|work)s?\b'
+      - '\b(have|having|had) sex\b'
+      - '\bhow to (have|do) (sex|it)\b'
+      - '\bmasturbat(e|ion|ing)\b'
+      - '\b(blow ?job|hand ?job|anal|bdsm|fetish|orgy|orgasm|dildo|vibrator|milf|gilf|hookup)\b'
+      - '\b(boobs?|titt?(y|ies)|tits|dick pic|penis pic|vagina pic|butt ?hole)\b'
+      - '\b(erotic|erotica|smut|lewd)\b'
+      - '\b(fuck|fucking|fucked) (video|pics?|girls?|boys?|hard)\b'
+      - '\b(leaked|leak) (nudes?|onlyfans|snap)\b'
+      - '\btelegram (nude|porn|leak)\b'
+      - '\b(18\+|adult) (video|site|content|chat)\b'
+      - '\bnude (beach|photos?|pics?|girls?|boys?|leak)\b'
+      - '\bxnxx\b|\bxvideos\b|\bxhamster\b|\bspankbang\b|\bredtube\b|\byouporn\b'
+      - '\badult (video|movie|film|clip|pic|photo|content|site|tube)s?\b'
+      - '\b(dick|penis|cock|boob|tit|butt|ass|vagina|pussy) (pic|pics|photo|photos|shot|shots)\b'
+      - '\bstrip club\b'
+      - '\b(nude|celeb|celebrity|onlyfans|snap|icloud|fappening) leaks?\b'
+      - '\bleaks?\b'
+      - '\b(prn|pr0n|p0rn|xxxhub|pornhd)\b'
+      - '\b(hot|sexy) (girls?|boys?|women|men|teens?) (pics?|photos?|videos?|near me)\b'
+      - '\b(deep ?throat|creampie|gangbang|threesome|cumshot|hardcore|softcore|jerk off|fap)\b'
+      - '\b(kink|kinky|hookup|one night stand|sugar daddy|sugar baby)\b'
+    squeeze:
+      - pornhub
+      - xvideos
+      - xhamster
+      - youporn
+      - redtube
+      - spankbang
+      - brazzers
+      - onlyfans
+      - stripchat
+      - chaturbate
+      - rule34
+      - nhentai
+      - hanime
+      - porno
+      - pornographic
+      - freeporn
+      - hdporn
+      - sexvideo
+      - sexvideos
+      - nudepics
+      - camgirls
+
+  - id: csam
+    tier: 1
+    action: block
+    label: Child sexual abuse material
+    safe:
+      - '\bsex(ual)? (chromosomes?|cells?|linked|reproduction|dimorphism|determination|selection)\b'
+      - '\basexual\b'
+      - '\bsex(ual)? (education|health|abuse (prevention|awareness|reporting|helpline))\b'
+      - '\b(child|kid|kids|children) (safety|protection|abuse) (prevention|awareness|reporting|helpline|hotline|resources?)\b'
+      - '\breport (child|csam|abuse)\b'
+      - '\bcybertip|\bmissing children\b'
+    any:
+      - '\b(child|kid|kids|minor|teen|preteen|underage|loli|lolita|shota|jailbait|toddler|infant|baby|schoolgirl|schoolboy|little girl|little boy|13yo|12yo|11yo|10yo|9yo|8yo)\b.{0,40}\b(porn|nude|naked|sex|xxx|erotic|hentai|cp|nudes|topless|undress|molest)\b'
+      - '\b(porn|nude|naked|sex|xxx|erotic|hentai|nudes|topless|undress|molest|leaks?)\b.{0,40}\b(child|kid|kids|minor|preteen|underage|loli|shota|jailbait|toddler|infant|schoolgirl|schoolboy|little girl|little boy|13yo|12yo|11yo|10yo|9yo|8yo)\b'
+      - '\b(child|kid|kids|minor|preteen|underage|jailbait|schoolgirl|schoolboy|little girl|little boy)\b.{0,20}\bleaks?\b'
+      - '\bchild (porn|sex|abuse (image|material|video))\b'
+      - '\b(loli|shota)con\b'
+      - '\bjail ?bait\b'
+      - '\bpedo(phile|philia)? (forum|site|chat|link|content)\b'
+      - '\bgroom(ing)? (a )?(child|kid|minor)\b'
+    squeeze:
+      - childporn
+      - childpornography
+      - kiddieporn
+      - cpvideos
+      - lolicon
+      - shotacon
+      - jailbait
+      - underagenudes
+
+  - id: weapons
+    tier: 1
+    action: block
+    label: Weapons and explosives
+    safe:
+      - '\b(nerf|water|foam|toy|lego|minecraft|fortnite|roblox|video game|paintball|airsoft|laser tag)\b'
+      - '\b(history|world war|ww1|ww2|museum|civil war|medieval|knight|samurai|viking) \w*(weapon|sword|gun|cannon)\b'
+      - '\bgun (control|laws?|violence statistics|safety course)\b'
+      - '\bvolcano|baking soda\b'
+    any:
+      - '\bghost ?(guns?|firearms?|pistols?|rifles?)\b'
+      - '\bfgc ?9\b'
+      - '\b(3d ?print(ed|ing)?|printed) (gun|firearm|pistol|receiver|lower|strap|heater)\b'
+      - '\bdefcad|deterrence dispensed\b'
+      - '\bauto ?sear|glock switch|drop in auto sear\b'
+      - '\b(build|make|making|diy|homemade|home made|craft) (a |an |your own )?(gun|pistol|rifle|shotgun|firearm|silencer|suppressor|taser|flamethrower|zip gun|pipe gun|strap|heater)\b'
+      - '\b(make|making|build|build a|diy|homemade|how to) (a |an )?(bomb|explosive|pipe bomb|pressure cooker bomb|molotov|napalm|thermite|c4|tnt|grenade|ied|land mine|dirty bomb)\b'
+      - '\b(anarchist|jolly roger) cookbook\b'
+      - '\bimprovised (explosive|munition|weapon|firearm)\b'
+      - '\b(molotov|napalm|thermite|pipe bomb|dirty bomb|ied|nitroglycerin|gunpowder|black powder|tnt|c4) (cocktail )?(recipe|instructions?|formula|guide|how to|tutorial|plans?|blueprints?)\b'
+      - '\bmolotov cocktail\b'
+      - '\b(3d ?print(ed|ing)?|untraceable|ghost|homemade|home made|diy) .{0,14}(strap|heater)\b'
+      - '\bhow to (make|synthesize) (black powder|gunpowder|nitroglycerin|tatp|ammonium nitrate bomb)\b'
+      - '\b(buy|get|order|purchase) (a )?(gun|rifle|pistol|firearm|ammo|ammunition|strap|heater)\b.{0,30}\b(no|without|skip|bypass) (a |the |any )?(background check|licence|license|permit|id|age)\b'
+      - '\b(gun|guns|firearms?|ammo|ammunition|rifle|pistol) (no|without) (id|age|background check|licence|license|permit|paperwork)\b'
+      - '\bconvert .{0,20}to (full|fully) auto\b'
+      - '\b(untraceable|80 ?percent|80%) (gun|lower|receiver|firearm)\b'
+      - '\bbutterfly knife (buy|for sale|cheap)\b'
+      - '\b(silencer|suppressor) (build|blueprint|solvent trap|plans)\b'
+      - '\bhow to (shoot|stab|hurt|attack|ambush) (someone|a person|people|my)\b'
+    squeeze:
+      - ghostgun
+      - ghostguns
+      - defcad
+      - howtomakeabomb
+      - howtomakeasilencer
+      - pipebomb
+      - anarchistcookbook
+      - 3dprintedgun
+      - glockswitch
+      - autosear
+
+  - id: drugs
+    tier: 1
+    action: block
+    label: Illegal drugs
+    safe:
+      - '\b(effects? of|dangers? of|side effects?|addiction|rehab|treatment|recovery|overdose (prevention|response)|naloxone|what is|history of|say no to|prevention|drug free|education|school project|essay)\b'
+      - '\bsnow (tires?|boots?|pants?|globe|shovel|blower|day|man|flake|storm|white)\b'
+      - '\bblow (dryer|torch|up|out|bubbles?|your nose)\b'
+      - '\bice (cubes?|cream|rink|berg|bergs|skating|hockey|age|maker|machine|pack|storm|fishing)\b'
+      - '\bcrystals?\b (growing|science|kit)\b'
+      - '\bgrow(ing)? crystals\b'
+      - '\bdrug store|drugstore\b'
+      - '\bcanada\.ca|health canada|cdc|nih\b'
+    any:
+      - '\b(buy|order|get|score|cop|where to (buy|get|find)|delivery|near me|for sale|cheap|online) (weed|marijuana|pot|cannabis|shrooms?|mushrooms?|lsd|acid|mdma|molly|ecstasy|coke|cocaine|crack|meth|heroin|fentanyl|ket(amine)?|xan(ax|nies)|percs?|oxy|adderall|vyvanse|dmt|steroids?)\b'
+      - '\b(weed|marijuana|cannabis|shroom|mushroom|coke|cocaine|meth|heroin|mdma|lsd|xanax|oxy|fentanyl) (dealer|plug|delivery|same day|near me|for sale|no id|without (a )?(prescription|id))\b'
+      - '\bhow (to|is) (make|making|made|cook|cooking|synthesize|synthesis|grow|growing|extract) .{0,20}\b(meth|methamphetamine|crack|cocaine|lsd|mdma|dmt|heroin|fentanyl|shrooms?|psilocybin|moonshine|hash|acid)\b'
+      - '\b(grow|growing|cultivate) (your own |my own )?(weed|cannabis|marijuana|shrooms?|psilocybin|mushrooms? at home)\b'
+      - '\b(meth|methamphetamine|cocaine|crack|heroin|lsd|mdma|fentanyl) (recipe|lab|cook|synthesis|is made|are made)\b'
+      - '\bhow (meth|methamphetamine|cocaine|crack|heroin|lsd|mdma|fentanyl) is made\b'
+      - '\b(dab|bong|vape) (pen )?(for|to) (get high|kids)\b'
+      - '\bhow to get high (on|off|with)\b'
+      - '\b(pass|beat|cheat) (a )?drug test\b'
+      - '\b(darknet|dark web|silk road|onion) (drug|market|vendor)\b'
+      - '\b(prescription|pills?) (without|no) (a )?(prescription|doctor|rx)\b'
+      - '\bplug for (weed|coke|molly|xans|blow|snow)\b'
+      - '\b(psilocybin|mushroom|shroom) spores?\b'
+      - '\b(lsd|acid) (blotter|tabs?|sheets?)\b'
+      - '\b(weed|marijuana|cannabis|cocaine|coke|meth|heroin|mdma|lsd|acid|shrooms?|ketamine|xanax|molly|blow|snow|psilocybin|spores?|blotter) (for sale|for cheap|price list)\b'
+      - '\b(buy|order|score|get|sell) (some |any )?(blow|snow|ice|bud|ganja|pot|dope|smack|crystal|methamphetamine)\b'
+      - '\b(grow|growing|cultivate) (your own |my own )?(ganja|pot|bud|dope)\b'
+      - '\bmoonshine (still|recipe|how to|make)\b'
+      - '\bhow (is |are )?(ice|crystal|bud|ganja|dope|smack|blow|snow) (is |are )?made\b'
+      - '\b(make|making|cook|cooking) (crystal|dope|smack|ganja)\b'
+      - '\b(ice|crystal|bud|ganja|pot|dope|smack|blow|snow) (dealer|plug|delivery|for sale)\b'
+      - '\b(make|making|cook|cooking) ice\b'
+    combo:
+      - verbs: ['\bhow to\b', '\bwhere to\b', '\bbest way to\b']
+        nouns: ['\bget high\b', '\bsmoke weed\b', '\btrip (on )?(acid|shrooms)\b', '\bsnort\b', '\binject\b']
+    squeeze:
+      - howtomakemeth
+      - buyweedonline
+      - weeddelivery
+      - growshrooms
+      - buycocaine
+      - buyxanax
+      - methrecipe
+
+  - id: gore
+    tier: 1
+    action: block
+    label: Gore and real violence
+    safe:
+      - '\b(movie|film|game|halloween|costume|makeup|fx|prosthetic|special effects?|fake blood|horror novel)\b'
+      - '\b(first aid|wound care|trauma surgery|medical|anatomy) \b'
+    any:
+      - '\b(gore|shock) (sites?|videos?|websites?|forums?|pics?|images?|photos?|content)\b'
+      - '\bliveg?ore|liveleak|best ?gore|watch ?people ?die|documenting ?reality|goretube|kaotic|theync\b'
+      - '\breal (death|killing|murder|execution|beheading) (video|footage|clip)\b'
+      - '\b(beheading|decapitation|execution|hanging|lynching|isis|cartel) (video|footage|clip|compilation)\b'
+      - '\b(torture|mutilation|dismember\w*) (method|technique|video|how to)\b'
+      - '\b(suicide|shooting|massacre|manifesto) (video|footage|livestream)\b'
+      - '\bhow to (hurt|torture|maim|mutilate|poison|stab) (someone|a person|people|my \w+)\b'
+      - '\bcrime scene (photos?|pics?|images?)\b'
+      - '\b(autopsy|morgue) (photos?|pics?|images?)\b'
+      - '\bfaces of death\b'
+      - '\bcartel (video|execution|chainsaw)\b'
+      - '\bgraphic (violence|content|death|injury) (compilation|video|footage|clips?)\b'
+      - '\b(violence|death|injury|accident|fight) compilation\b'
+    squeeze:
+      - bestgore
+      - livegore
+      - liveleak
+      - watchpeopledie
+      - documentingreality
+      - beheadingvideo
+      - executionvideo
+      - facesofdeath
+      - realdeathvideos
+
+  - id: darkweb
+    tier: 1
+    action: block
+    label: Dark web
+    any:
+      - '\b(dark|deep) ?(web|net) (link|market|site|access|guide|how to|search|directory|url)s?\b'
+      - '\bhow to (access|get on|get into|browse) (the )?(dark ?web|dark ?net|onion)\b'
+      - '\b(darknet|dark ?web) market(place)?s?\b'
+      - '\b(hidden wiki|onion (link|directory|site)s?|\.onion)\b'
+      - '\b(deep|dark) ?web (search engines?|browsers?|links?|sites?|guides?)\b'
+      - '\b(tor|onion) .{0,20}(market|drug|gun|card|hitman)\b'
+      - '\bhire (a |an )?(hacker|cracker|breacher|hitman|assassin|killer|goon)\b'
+      - '\b(alphabay|hydra market|archetyp|abacus market|nemesis market|torrez|dark ?market)\b'
+      - '\b(buy|sell) .{0,20}(on the )?dark ?web\b'
+      - '\bdark ?web .{0,16}(credit cards?|cards?|passports?|accounts?|logins?|paypal|drugs?|guns?|weapons?)\b'
+      - '\b(deep|dark) ?web (search engine|browser|guide|tutorial|how to)\b'
+    squeeze:
+      - darkwebmarket
+      - darkwebmarkets
+      - darkweblinks
+      - hiddenwiki
+      - howtoaccessthedarkweb
+      - hireahacker
+      - hireahitman
+      - onionlinks
+
+  # --------------------------------------------------- images-only (tier 2) --
+  # Applied ONLY when the search targets the image tab.  A thumbnail grid gives
+  # a child the picture with no snippet, no domain and no context to soften it,
+  # so terms that merely produce awkward text results are refused as pictures.
+  # These are deliberately *not* blocked for ordinary web search: a kid reading
+  # about swimwear or human anatomy is fine, a grid of images of it is not.
+  - id: images_strict
+    tier: 2
+    action: block
+    scope: images
+    label: Not available as image search
+    safe:
+      - '\b(bird|fish|insect|animal|plant|flower|tree|rock|mineral|cloud|planet|galaxy|dinosaur|volcano|castle|flag|map|diagram|graph|skeleton|cell|atom|molecule)\b'
+      - '\b(anatomy|biology|science|medical|textbook|diagram|for kids|history of|renaissance|museum|painting|sculpture)\b'
+      - '\b(swimming|swim) (lessons?|class(es)?|team|practice|club|meet|goggles|cap)\b'
+      - '\b(sports? ?bra|life ?jacket|wet ?suit|uniform|costume|halloween)\b'
+    any:
+      - '\b(bikini|swimsuit|swimwear|lingerie|underwear|panties|thong|bra|corset|negligee)\b'
+      - '\b(cleavage|midriff|upskirt|downblouse|see ?through|wet t ?shirt|camel toe)\b'
+      - '\b(shirtless|topless|bottomless|undressed|undressing|changing room|locker room)\b'
+      - '\b(hot|sexy|attractive|beautiful|pretty) (girls?|boys?|women|men|models?|teens?|babes?)\b'
+      - '\b(model|models|modelling|modeling) (photo|photos|shoot|pics?|gallery)\b'
+      - '\b(body|butt|booty|abs|six pack|thigh|legs|feet|foot) (pics?|photos?|goals)\b'
+      - '\b(bed|bedroom|shower|bath|bathtub|pool) (selfie|pics?|photos?)\b'
+      - '\b(girls?|boys?|women|men) in (bikinis?|underwear|lingerie|swimsuits?)\b'
+      - '\b(anime|manga|waifu) (girl|girls|babe|thicc|curvy)\b'
+      - '\b(gore|blood|wound|injury|surgery|autopsy|corpse|dead body|carcass|roadkill)\b'
+      - '\b(scary|disturbing|cursed|creepy|nightmare fuel) (images?|pics?|photos?)\b'
+    fuzzy: []
+
+  # ---------------------------------------------------------------- tier 2 --
+  - id: gambling
+    tier: 2
+    action: block
+    label: Gambling
+    safe:
+      - '\b(addiction|problem gambling|help|responsible|statistics|odds of|probability|math|history of|age (limit|restriction))\b'
+      - '\bmonopoly|board game|game night|poker face\b'
+    any:
+      - '\b(online )?(casino|slots?|roulette|blackjack|baccarat|sportsbook|betting site)s?\b'
+      - '\b(bet|betting|wager|gambl\w+) (online|real money|crypto|site|app|no kyc|without id)\b'
+      - '\b(no ?kyc|no id|anonymous) (casino|betting|gambling|sportsbook)\b'
+      - '\b(stake\.com|roobet|bc\.game|duelbits|rollbit|bovada|betway|draftkings|fanduel|bet365|1xbet)\b'
+      - '\b(csgo|cs2|skin|case) (gambling|betting|coinflip|roulette|opening site)\b'
+      - '\b(free )?spins? no deposit\b'
+      - '\b(sports|nfl|nba|nhl) (betting|odds|picks|parlay)\b'
+      - '\b(lottery|scratch card) (buy online|hack|guaranteed win)\b'
+      - '\bcrypto (casino|betting|gambling)\b'
+      - '\bbet(ting)? (with|no|without) (out )?(id|kyc|verification|age)\b'
+      - '\b(cs ?go|cs ?2) (skin|case|coin ?flip)\b'
+    squeeze:
+      - onlinecasino
+      - nokyccasino
+      - cryptocasino
+      - skingambling
+      - csgogambling
+      - sportsbetting
+
+  - id: alcohol_tobacco
+    tier: 2
+    action: block
+    label: Alcohol, tobacco and vapes
+    safe:
+      - '\b(dangers?|effects?|health risks?|quit|quitting|cessation|addiction|prevention|underage drinking (statistics|prevention)|law|legal age|history of)\b'
+      - '\bnon ?alcoholic|mocktail|root beer|ginger beer\b'
+    any:
+      - '\b(buy|order|get|ship) (alcohol|beer|vodka|liquor|wine|cigarettes?|cigars?|vapes?|e ?cig\w*|nicotine|juul|zyn|snus)\b.{0,30}\b(no|without|skip|bypass) (id|age|verification|check|21|19|18)\b'
+      - '\b(alcohol|cigarettes?|vapes?|nicotine|juul|zyn|tobacco) (no|without) (id|age (check|verification))\b'
+      - '\b(fake|novelty|scannable) ?id\b.{0,30}\b(buy|alcohol|bar|club|work|liquor|beer|vape|cigarettes?)\b'
+      - '\bhow (to|do i) (get|buy) (alcohol|beer|vodka|cigarettes?|vapes?|weed) (under ?age|underage|as a (minor|kid|teen)|at 1[0-9])\b'
+      - '\b(vape|e ?juice|nicotine) (flavou?rs? )?for (kids?|teens?|minors?|school)\b'
+      - '\bhide (a )?(vape|cigarettes?|alcohol) from (parents?|teachers?|school)\b'
+      - '\b(sneak|smuggle) (alcohol|vape|booze) (into|past)\b'
+      - '\bhow to (get drunk|make moonshine|make alcohol at home|brew (beer|alcohol) secretly)\b'
+      - '\bonline (cigarettes?|vape|tobacco) (no|without) age\b'
+      - '\b(nicotine|tobacco|vape|juul|zyn|snus) (pouch|pouches|pods?|carts?|sticks?)\b.{0,20}\b(no|without|underage|under ?age|minor)\b'
+      - '\b(buy|order|get) .{0,20}\b(juul|vape|nicotine|zyn|snus|cigarettes?|alcohol|beer|vodka|liquor)\b.{0,20}\bunder ?age\b'
+      - '\bunder ?age\b.{0,20}\b(juul|vape|nicotine|zyn|snus|cigarettes?|alcohol|beer|vodka|liquor|drinking (party|guide))\b'
+      - '\b(make|brew|distill|ferment) (alcohol|booze|moonshine|wine|beer) at home (secretly|without|hidden|in secret)\b'
+      - '\b(alcohol|moonshine) at home secretly\b'
+    squeeze:
+      - buyalcoholnoid
+      - fakeidforalcohol
+      - vapenoage
+      - cigarettesnoid
+
+  - id: piracy_fraud
+    tier: 2
+    action: block
+    label: Piracy and fraud
+    safe:
+      - '\b(is it (legal|illegal)|law|penalt|copyright (law|infringement) (explained|definition)|anti ?piracy|history of piracy|pirate ship|pirates? of the caribbean|somali pirates?)\b'
+      - '\b(open source|free (and )?legal|public domain|creative commons|abandonware museum)\b'
+    any:
+      - '\b(fitgirl|dodi|skidrow|codex|empress|rune|plaza|igg ?games|steamunlocked|ocean ?of ?games|apunkagames)\b'
+      - '\b(cracked?|crack|keygen|torrent|repack|nulled|pre ?activated|full version free) (game|software|download|version|apk|adobe|office|windows|photoshop)\b'
+      - '\b(game|software|movie|show|album|book) (crack|repack|torrent|piracy) (download|site)\b'
+      - '\b(free download|download free) (full (movie|game|album|version)|premium|cracked?)\b'
+      - '\b(watch|stream) .{0,30}\b(free|online) (full movie|hd)\b.{0,20}\b(no sign ?up|123|putlocker|fmovies|soap2day)\b'
+      - '\b(123 ?movies|putlocker|fmovies|soap ?2 ?day|the ?pirate ?bay|1337x|rarbg|yts|kickass ?torrents|nyaa|zlib(rary)?|libgen|annas ?archive)\b'
+      - '\b(fake|novelty|scannable) id (maker|template|website|that works|vendor)\b'
+      - '\bhow to make a fake (id|passport|licence|license|diploma)\b'
+      - '\b(carding|cc ?dump|fullz|cvv shop|stolen (credit )?card|bin list)\b'
+      - '\b(free|hacked|generator) (netflix|spotify|disney|steam|robux|vbucks|gift ?card) (account|code|generator)s?\b'
+      - '\b(bypass|crack|remove) (paywall|drm|activation|licence|license)\b'
+      - '\b(kms ?pico|kms ?auto|windows (activator|loader)|office activator|re ?loader)\b'
+      - '\b(robux|vbucks|v ?bucks|gems?|coins?|credits?) (generator|hack|glitch|free)\b'
+      - '\b(free|unlimited) (robux|vbucks|v ?bucks)\b'
+    squeeze:
+      - fitgirlrepacks
+      - crackedgames
+      - freefullgamedownload
+      - fakeidmaker
+      - howtomakeafakeid
+      - stolencreditcards
+      - carding
+      - cvvshop
+
+  - id: hacking
+    tier: 2
+    action: block
+    label: Hacking for harm
+    safe:
+      - '\b(ethical hacking (course|certification)|ceh|oscp|capture the flag|ctf|bug bounty|pen ?test(ing)? (course|lab)|cyber ?security (course|career|degree)|how to (protect|secure)|prevent (hacking|phishing)|is my \w+ (safe|secure))\b'
+      - '\b(life ?hack|growth hack|minecraft|roblox|kahoot) \b'
+    any:
+      - '\bhow to hack (someone\w*|a|an|my (ex|friend|classmate|teacher)|into)\b'
+      - '\bhack (someone\w*|a|an|his|her|their|my (ex|friend|sister|brother)) (instagram|snapchat|facebook|whatsapp|tiktok|phone|account|wifi|email|discord|roblox)\b'
+      - '\b(instagram|snapchat|facebook|whatsapp|tiktok|discord|gmail|roblox|fortnite) (password )?(hack|hacker|cracker|stealer) (tool|free|online|no survey)\b'
+      - '\b(keylogger|rat|remote access trojan|stealer|botnet|ransomware|ddos|booter|stresser) (download|buy|free|tutorial|builder)\b'
+      - '\b(spy|track|monitor|read) (on )?(someone\w*|my (partner|kid|ex|friend)s?) (phone|texts?|messages?|location) (secretly|without them knowing)\b'
+      - '\b(steal|phish|dump|crack) (passwords?|credentials?|accounts?|cookies?|session)\b'
+      - '\bhow to (ddos|dox|swat|sim swap)\b'
+      - '\bwifi (password )?(hack|cracker) (tool|apk|download)\b'
+      - '\bsql injection (attack|tutorial) (site|live|target)\b'
+      - '\b(get|break|log|logging) (in)?to (someone\w*|somebody\w*|his|her|their|my (ex|friend|sister|brother|classmate|teacher)s?)\b'
+      - '\b(get|break) into .{0,16}(instagram|snapchat|facebook|whatsapp|tiktok|discord|roblox|gmail|email|account|phone)\b'
+      - '\b(hack|hacking|crack|cracking|breach|breaching|break|breaking|bypass) ((in)?to )?(someone\w*|somebody\w*|a|an|the|his|her|their|my ex\w*)? ?(instagram|snapchat|facebook|whatsapp|tiktok|phone|account|wifi|email|discord|roblox|password)\b'
+      - '\bwifi password (hack|crack|breach|break into|steal\w*|recovery) (tool|apk|download|app|free)?\b'
+      - '\b(password|account|wifi) (hack|crack|breach|break into|stealer) tool\b'
+      - '\bspy on .{0,24}(phone|texts?|messages?|location|snap|dms?)\b'
+      - '\b(without|wihtout) (them|him|her|any ?one) knowing\b'
+    squeeze:
+      - howtohacksomeone
+      - hackinstagramaccount
+      - freekeylogger
+      - ddosbooter
+      - passwordstealer
+
+  - id: extremism
+    tier: 2
+    action: block
+    label: Extremism and hate
+    safe:
+      - '\b(wikipedia|britannica|ushmm|holocaust museum|adl|splc|history of|what (was|is|were)|documentary|survivor|memorial|education|lesson|essay|why did|causes of|defeat of)\b'
+      - '\b(anti ?racism|counter ?extremism|deradicalisation|deradicalization|report (hate|extremism))\b'
+    any:
+      - '\b(white|aryan|racial) (power|pride|nationalis[tm]|supremac\w+) (music|song|band|playlist|forum|group|join|merch)\b'
+      - '\b(nazi|neo ?nazi|kkk|klan|hitler) (music|merch|shop|forum|join|recruit|meme|glorif\w+)\b'
+      - '\b(hail|sieg) heil\b'
+      - '\b(14|1488) ?words\b'
+      - '\b(daily ?stormer|stormfront|iron ?march|8 ?kun|8 ?chan|gab\.com|bitchute nazi)\b'
+      - '\b(join|joining|recruit\w*|contact) (the )?(isis|isil|daesh|al ?qaeda|taliban|hamas|proud boys|atomwaffen|the base|terrorist)\b'
+      - '\b(jihad|martyrdom|terrorist) (recruit|training|manual|how to|guide|video)\b'
+      - '\b(great replacement|accelerationis[tm]|siege culture|tarrant|breivik) (manifesto|pdf|full text)\b'
+      - '\b(holocaust|genocide) (denial|hoax|never happened|fake)\b'
+      - '\b(race war|ethnic cleansing) (how|guide|prepare|start)\b'
+      - '\bterrorist (recruitment|recruiting|propaganda|training)\b'
+      - '\b(recruitment|propaganda) (video|material|content)\b.{0,20}\b(isis|isil|terrorist|jihad|nazi|extremist)\b'
+      - '\b(isis|isil|daesh|al ?qaeda|taliban|jihad(ist)?|nazi|neo ?nazi) (video|propaganda|recruitment|manual|content|channel)s?\b'
+    squeeze:
+      - whitepowermusic
+      - dailystormer
+      - stormfront
+      - 1488
+      - holocaustdenial
+      - terroristmanual
+
+  - id: profanity
+    tier: 2
+    action: block
+    label: Slurs and graphic profanity
+    safe:
+      - '\b(etymology|dictionary|definition|why is .{0,20}offensive|history of the word|slur (history|origin)|reclaim\w*|why you should ?nt say|hate speech (policy|law|definition))\b'
+    any:
+      - '\b(list of|worst|best|top \d+|funniest) (swear ?words?|curse ?words?|cuss ?words?|slurs?|racial slurs?|insults?|offensive jokes?|dirty jokes?|racist jokes?|dead baby jokes?)\b'
+      - '\b(racist|racial|sexist|homophobic|transphobic|ableist) (slur|joke|meme|insult)s?\b'
+      - '\b(offensive|dirty|rude|nasty|filthy) (jokes?|memes?|words?|pick ?up lines?)\b'
+      - '\bhow to (swear|curse|insult|roast) (in|someone)\b.{0,20}\b(worst|meanest|hardest)\b'
+      - '\bmeanest (insults?|things? to say|roasts?)\b'
+      - '\bdead baby jokes?\b'
+      - '\b(dark|edgy|holocaust|rape|racist|sexist|dead ?baby) jokes?\b'
+    squeeze:
+      - listofracialslurs
+      - racistjokes
+      - offensivejokes
+      - swearwordlist

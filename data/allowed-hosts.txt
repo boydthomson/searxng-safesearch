@@ -1,0 +1,115 @@
+# Allowlist -- always wins over the compiled blocklist and over the classifier.
+# Add a host here when an upstream list false-positives something a kid needs.
+# Subdomains of these entries are allowed too.
+
+# reference / encyclopaedic
+wikipedia.org
+wikimedia.org
+wiktionary.org
+wikidata.org
+wikibooks.org
+britannica.com
+dictionary.com
+merriam-webster.com
+thesaurus.com
+archive.org
+
+# education / homework
+khanacademy.org
+ducksters.com
+scholastic.com
+pbskids.org
+pbslearningmedia.org
+natgeokids.com
+nationalgeographic.com
+coolmath4kids.com
+coolmathgames.com
+mathsisfun.com
+brainpop.com
+ck12.org
+quizlet.com
+sciencing.com
+explainthatstuff.com
+kiddle.co
+kidzsearch.com
+factmonster.com
+timeforkids.com
+newsela.com
+tvokids.com
+
+# science / space / nature
+nasa.gov
+noaa.gov
+usgs.gov
+si.edu
+amnh.org
+esa.int
+nature.com
+sciencedaily.com
+livescience.com
+space.com
+allaboutbirds.org
+worldwildlife.org
+
+# health, crisis and public services (must never be filtered)
+canada.ca
+gc.ca
+who.int
+cdc.gov
+nih.gov
+nlm.nih.gov
+medlineplus.gov
+nhs.uk
+mayoclinic.org
+healthlinkbc.ca
+kidshelpphone.ca
+talksuicide.ca
+988.ca
+camh.ca
+cmha.ca
+nedic.ca
+nationaleatingdisorders.org
+heretohelp.bc.ca
+jedfoundation.org
+kidshealth.org
+
+# history / memorial / anti-hate education
+ushmm.org
+holocaustmuseum.ca
+adl.org
+splcenter.org
+yadvashem.org
+imperialwarmuseums.org
+warmuseum.ca
+
+# news
+cbc.ca
+bbc.co.uk
+bbc.com
+theguardian.com
+reuters.com
+apnews.com
+
+# tech / developer references
+stackoverflow.com
+stackexchange.com
+superuser.com
+askubuntu.com
+developer.mozilla.org
+mozilla.org
+python.org
+github.com
+gitlab.com
+w3schools.com
+arduino.cc
+raspberrypi.com
+raspberrypi.org
+scratch.mit.edu
+code.org
+
+# sports / hobbies
+olympics.com
+fifa.com
+nhl.com
+mlb.com
+nba.com
