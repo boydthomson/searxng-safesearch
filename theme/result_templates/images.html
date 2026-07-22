@@ -1,0 +1,39 @@
+{#- Image result card + lightbox.
+    Customised for the safe-search instance: the stock detail panel buries the
+    link to the page hosting the image in a label/value table at the bottom, so
+    the only obvious action is opening the raw image file.  This puts a
+    prominent "Visit page" action first, the way Google Images does, and keeps
+    "Open image" as the secondary action.
+    Class names used by the theme's JS (.detail, .result-detail-close,
+    .result-detail-previous, .result-detail-next, .result-images-source) are
+    preserved. -#}
+<article class="result result-images {% if result['category'] %}category-{{ result['category'] }}{% endif %}">{{- "" -}}
+        <a {% if results_on_new_tab %}target="_blank" rel="noopener noreferrer"{% else %}rel="noreferrer"{% endif %} href="{{ result.img_src }}">{{- "" -}}
+                <img class="image_thumbnail" {% if results_on_new_tab %}target="_blank" rel="noopener noreferrer"{% else %}rel="noreferrer"{% endif %} src="{% if result.thumbnail_src %}{{ image_proxify(result.thumbnail_src) }}{% else %}{{ image_proxify(result.img_src) }}{% endif %}" alt="{{ result.title|striptags }}" loading="lazy" width="200" height="200">{{- "" -}}
+		{%- if result.resolution %} <span class="image_resolution">{{ result.resolution }}</span> {%- endif -%}
+		<span class="title">{{ result.title|striptags }}</span>{{- "" -}}
+                <span class="source">{{- result.parsed_url.netloc -}}</span>{{- "" -}}
+        </a>{{- "" -}}
+        <div class="detail swipe-horizontal">{{- "" -}}
+                <a class="result-detail-close" href="#">{{ icon('close') }}</a>{{- "" -}}
+                <a class="result-detail-previous" href="#">{{ icon('navigate-left') }}</a>{{- "" -}}
+                <a class="result-detail-next" href="#">{{ icon('navigate-right') }}</a>{{- "" -}}
+                <a class="result-images-source" {% if results_on_new_tab %}target="_blank" rel="noopener noreferrer"{% else %}rel="noreferrer"{% endif %} href="{{ result.img_src }}">
+                        <img src="" data-src="{{ image_proxify(result.img_src) }}" alt="{{ result.title|striptags }}">{{- "" -}}
+                </a>{{- "" -}}
+                <div class="result-images-labels">{{- "" -}}
+                        <h4>{{ result.title|striptags }}</h4>{{- "" -}}
+                        <p class="image-meta">{{- "" -}}
+                                <span class="image-site">{{ result.parsed_url.netloc }}</span>{{- "" -}}
+                                {%- if result.resolution %}<span class="image-dims">{{ result.resolution }}</span>{% endif -%}
+                                {%- if result.img_format %}<span class="image-fmt">{{ result.img_format }}</span>{% endif -%}
+                        </p>{{- "" -}}
+                        <p class="image-actions">{{- "" -}}
+                                <a class="btn-visit" target="_blank" rel="noopener noreferrer" href="{{ result.url }}">Visit page</a>{{- "" -}}
+                                <a class="btn-image" target="_blank" rel="noopener noreferrer" href="{{ result.img_src }}">Open image</a>{{- "" -}}
+                        </p>{{- "" -}}
+                        {%- if result.content %}<p class="result-content">{{ result.content|striptags }}</p>{% endif -%}
+                        <p class="image-host">{{ result.url }}</p>{{- "" -}}
+                </div>{{- "" -}}
+        </div>{{- "" -}}
+</article>

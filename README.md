@@ -110,6 +110,12 @@ engines that hard-enforce safe search", which is what this is:
   proxied, zero hotlinked — the child's browser never contacts an image CDN;
 - the L4 plugin scores `img_src` / `thumbnail_src`, not just the result URL.
 
+The lightbox is overridden (`theme/`) to put a **Visit page** button on the
+source site rather than burying that link in a metadata table under an
+"Open image" action. `theme/README.md` also documents why the stock lightbox
+silently collapses into a thumbnail-sized box when the theme animates results,
+and what to check before adding analytics to a search engine.
+
 Measured on 15 deliberately borderline queries (`beach`, `party`, `yoga`,
 `gymnastics`, `cheerleader`, `art model`, `sleepover`, …): **2,003 image
 results, 0 flagged** by the blocklist or the classifier.

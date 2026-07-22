@@ -1,0 +1,27 @@
+/* ===== image-viewer fixes ===== */
+/* The result fade-in animates `transform`.  With animation-fill-mode:both the
+   computed value stays an identity matrix rather than `none`, and *any*
+   transform other than `none` makes the element the containing block for
+   position:fixed descendants -- which collapses the image lightbox
+   (.result-images .detail, position:fixed inset:13rem 0 0 60rem) into its grid
+   cell.  Image results opt out of the animation and force transform:none. */
+#urls .result-images{animation:none!important;transform:none!important}
+
+/* Google-Images-style detail panel: the page hosting the image is the primary
+   action, not the raw image file. */
+.result-images[data-vim-selected] .detail .result-images-labels{height:auto;max-height:26rem}
+.result-images[data-vim-selected] .detail .result-images-labels h4{height:auto;white-space:normal;font-size:1.05rem;line-height:1.35;margin:0 0 .6rem}
+.image-meta{display:flex;flex-wrap:wrap;gap:.5rem .9rem;align-items:center;margin:0 0 1rem!important;font-size:.85rem;white-space:normal!important}
+.image-meta .image-site{font-weight:600;color:var(--color-result-detail-font)}
+.image-meta .image-dims,.image-meta .image-fmt{color:var(--color-result-detail-label-font)}
+.image-actions{display:flex;gap:.6rem;margin:0 0 1rem!important;white-space:normal!important;overflow:visible!important}
+.image-actions a{display:inline-block;padding:.55rem 1.15rem;border-radius:999px;font-weight:600;font-size:.9rem;text-decoration:none!important;line-height:1.2}
+.image-actions a.btn-visit{background:#12507d;color:#fff}
+.image-actions a.btn-visit:hover{background:#1a6ba6}
+.image-actions a.btn-image{background:var(--color-result-detail-hr);color:var(--color-result-detail-font)}
+.image-actions a.btn-image:hover{filter:brightness(1.25)}
+.result-images-labels p.image-host{font-size:.78rem;color:var(--color-result-detail-label-font);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:.2rem 0 0!important}
+.result-images-labels p.result-content{height:auto;white-space:normal!important;font-size:.85rem;line-height:1.4}
+@media screen and (max-width:50em){
+  .image-actions a{padding:.7rem 1.2rem;font-size:.95rem}
+}
