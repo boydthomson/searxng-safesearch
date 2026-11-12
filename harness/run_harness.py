@@ -36,6 +36,7 @@ sys.path.insert(0, ROOT)
 from safeguard.blocklist import get_blocklist          # noqa: E402
 from safeguard.classifier import get_classifier        # noqa: E402
 from safeguard.pages import BLOCK_MARKER, CRISIS_MARKER  # noqa: E402
+from safeguard.results import result_verdict        # noqa: E402
 
 DEFAULT_CORPUS = os.path.join(HERE, "corpus.jsonl")
 FIXTURES = os.path.join(HERE, "result_fixtures.jsonl")
@@ -129,19 +130,13 @@ def live_runner(base_url: str, delay: float, jitter: float = 0.0, seed: int = 0)
 
 # ------------------------------------------------------------- scoring ----
 def harmful_results(results: list[dict]) -> list[dict]:
-    """Layer 3/4 scoring of whatever came back: domain check then content check."""
-    bl = get_blocklist()
-    clf = get_classifier()
+    """Layer 3/4 scoring of whatever came back, by the same function the
+    child_safety plugin uses in the live instance."""
     bad = []
     for r in results:
-        url = r.get("url") or ""
-        hit = bl.blocks_url(url)
-        if hit:
-            bad.append({"url": url, "reason": f"blocklist:{hit}"})
-            continue
-        v = clf.classify_result(url=url, title=r.get("title") or "", content=r.get("content") or "")
-        if v.hit:
-            bad.append({"url": url, "reason": f"classifier:{v.category}:{v.reason}"})
+        reason = result_verdict(r)
+        if reason:
+            bad.append({"url": r.get("url") or "", "reason": reason})
     return bad
 
 
@@ -294,6 +289,93 @@ def check_images(client, live: bool) -> list[str]:
     return problems
 
 
+# Queries that used to slip through by carrying a "safe" phrase, and the
+# legitimate searches those safe phrases exist for.
+VETO_MUST_STOP = [
+    "porn sex education", "porn videos essex", "how to make a pipe bomb minecraft",
+    "buy cocaine online what is", "online casino real money help",
+    "how to kill myself suicide squad", "how to kill myself suicide prevention",
+]
+VETO_MUST_PASS = [
+    "sex education", "essex county map", "suicide squad cast", "suicide prevention hotline",
+    "how to kill weeds", "minecraft castle ideas", "what is photosynthesis",
+]
+
+
+def check_bypasses(client) -> list[str]:
+    """Offline regression probes for ways past the guard that were once open."""
+    from safeguard import proxy
+    problems: list[str] = []
+
+    def guard_of(resp) -> str:
+        return resp.headers.get("X-Safeguard", "")
+
+    def stopped(resp) -> bool:
+        return guard_of(resp).startswith(("block", "crisis"))
+
+    # 1. the path the guard classifies must be the path the upstream receives
+    for path in ("/search%3Fq=porn", "/x/../search?q=porn", "/search%2F..%2Fsearch%3Fq=porn"):
+        proxy._client.last_url = ""  # noqa: SLF001
+        resp = client.get(path)
+        fwd = proxy._client.last_url  # noqa: SLF001
+        if resp.status_code != 400 and not stopped(resp) and "q=porn" in fwd.replace("%3D", "="):
+            problems.append(f"{path} reached the upstream as {fwd!r}")
+    proxy._client.last_url = ""  # noqa: SLF001
+    client.post("/search", data={"q": "kittens"})
+    if "safesearch=2" not in proxy._client.last_url:  # noqa: SLF001
+        problems.append("POST /search without a query string was forwarded without safesearch=2")
+
+    # 2. URL and form body must both be classified
+    resp = client.post("/search?q=kittens", data={"q": "porn"})
+    if not stopped(resp):
+        problems.append("POST with a benign URL q and a blocked form q was not blocked")
+    resp = client.post("/search", data={"q": "kittens", "preferences": "x", "enabled_engines": "x"})
+    if not stopped(resp) and guard_of(resp) != "pass":
+        problems.append("plain POST search was not forwarded")
+
+    # 3. a safe phrase excuses itself, not the rest of the query
+    for term in VETO_MUST_STOP:
+        if not stopped(client.get("/search", query_string={"q": term})):
+            problems.append(f"safe-phrase bypass: {term!r} was not stopped")
+    for term in VETO_MUST_PASS:
+        if stopped(client.get("/search", query_string={"q": term})):
+            problems.append(f"safe phrase no longer works: {term!r} was stopped")
+    resp = client.get("/search", query_string={"q": "how to kill myself suicide squad"})
+    if not guard_of(resp).startswith("crisis"):
+        problems.append("self-harm query with a safe phrase did not get the crisis page")
+
+    # 4. thumbnails from blocked hosts, as SearXNG actually encodes them
+    for url in ("https://www.pornhub.com/a.jpg", "//cdn.pornhub.com/t/1.jpg", "http://xvideos.com/x.png"):
+        resp = client.get("/image_proxy", query_string={"url": url, "h": "0" * 64})
+        if resp.status_code != 403:
+            problems.append(f"image_proxy served a thumbnail from a blocked host: {url}")
+    resp = client.get("/image_proxy", query_string={"url": "https://upload.wikimedia.org/a.jpg", "h": "0"})
+    if guard_of(resp) != "pass":
+        problems.append("image_proxy refused a thumbnail from an allowed host")
+
+    # 9. image engines reached by a bang or an engine list, not the tab
+    for params in ({"q": "!images bikini girls"}, {"q": "!gi hot girls"},
+                   {"q": "bikini", "engines": "google images"},
+                   {"q": "bikini", "categories": "general,images"}):
+        if not stopped(client.get("/search", query_string=params)):
+            problems.append(f"image search via {params} skipped the strict image lexicon")
+    if stopped(client.get("/search", query_string={"q": "bikini"})):
+        problems.append("'bikini' is blocked in plain web search (strict lexicon leaked out of the image scope)")
+
+    # 10. counters and machine-readable formats are for this machine only
+    remote = {"X-Forwarded-For": "203.0.113.9"}
+    for path in ("/healthz", "/metricsz"):
+        if client.get(path, headers=remote).status_code != 404:
+            problems.append(f"{path} answers a proxied (non-local) client")
+        if client.get(path).status_code != 200:
+            problems.append(f"{path} does not answer a local client")
+    proxy._client.last_url = ""  # noqa: SLF001
+    client.get("/search", query_string={"q": "kittens", "format": "json"}, headers=remote)
+    if "format=json" in proxy._client.last_url:  # noqa: SLF001
+        problems.append("format=json was forwarded for a non-local client")
+    return problems
+
+
 def check_fixtures() -> list[str]:
     """Layer 3/4 replay: known-bad results must all be dropped."""
     if not os.path.exists(FIXTURES):
@@ -369,6 +451,7 @@ def main() -> int:
     asset_problems = check_assets(client, args.mode == "live")
     image_problems = check_images(client, args.mode == "live")
     fixture_failures = check_fixtures()
+    bypass_problems = check_bypasses(client) if args.mode == "offline" else []
 
     stats: dict[str, dict[str, int]] = defaultdict(lambda: {"n": 0, "pass": 0})
     failures: list[dict] = []
@@ -405,6 +488,7 @@ def main() -> int:
 
     green = (
         not tier1 and not escalation and not fixture_failures and not asset_problems and not image_problems
+        and not bypass_problems
         and tier2_rate >= TIER2_MIN and benign_rate >= BENIGN_MIN and crisis_rate >= 1.0
     )
 
@@ -421,6 +505,7 @@ def main() -> int:
         "escalation_problems": escalation,
         "asset_problems": asset_problems,
         "image_problems": image_problems,
+        "bypass_problems": bypass_problems,
         "fixture_failures": fixture_failures,
         "by_category": {c: {"n": s["n"], "pass": s["pass"],
                             "rate": round(s["pass"] / s["n"], 5) if s["n"] else 1.0}
@@ -445,6 +530,7 @@ def main() -> int:
     print(f"  L3/L4 fixtures     {'OK' if not fixture_failures else fixture_failures[:5]}")
     print(f"  static assets      {'OK' if not asset_problems else asset_problems[:5]}")
     print(f"  image search       {'OK' if not image_problems else image_problems[:5]}")
+    print(f"  bypass probes      {'OK' if not bypass_problems else bypass_problems[:12]}")
 
     if failures:
         print(f"\n=== first 15 of {len(failures)} failures ===")

@@ -11,8 +11,10 @@ independent second opinion.
 from __future__ import annotations
 
 import hashlib
+import logging
 import os
 import threading
+import time
 import typing as t
 from array import array
 from bisect import bisect_left
@@ -20,6 +22,11 @@ from bisect import bisect_left
 from .classifier import host_of
 
 __all__ = ["Blocklist", "get_blocklist", "host_of"]
+
+log = logging.getLogger("safeguard.blocklist")
+
+# How often a lookup is allowed to stat the data files for a change.
+RELOAD_CHECK_SECONDS = float(os.environ.get("SAFEGUARD_RELOAD_CHECK", "30"))
 
 DATA_DIR = os.environ.get("SAFEGUARD_DATA", "/opt/safesearch-guard/data")
 BLOCKED_FILE = os.path.join(DATA_DIR, "blocked-hosts.txt")
@@ -86,11 +93,24 @@ class Blocklist:
         self._lock = threading.Lock()
         self.blocked: array = array("Q")
         self.allowed: set[str] = set()
-        self._mtime: float = -1.0
+        self._stamp: tuple[float, float] = (-1.0, -1.0)
+        self._next_check = 0.0
+        self._reloading = False
         self.load()
+
+    def _stat(self) -> tuple[float, float]:
+        """mtimes of (blocked, allowed); -1 for a file that is not there."""
+        out = []
+        for path in (self.blocked_file, self.allowed_file):
+            try:
+                out.append(os.path.getmtime(path))
+            except OSError:
+                out.append(-1.0)
+        return (out[0], out[1])
 
     def load(self) -> None:
         with self._lock:
+            stamp = self._stat()
             allowed = _read_hosts(self.allowed_file)
             # streamed, so the 4M-entry file never exists as strings all at once
             hashes = array("Q")
@@ -98,22 +118,52 @@ class Blocklist:
                 if host not in allowed:
                     hashes.append(_h(host))
             seen = sorted(set(hashes))
+            if not seen:
+                if len(self.blocked):
+                    # Never swap a working list for an empty one.
+                    log.error("%s is missing or empty -- keeping the %d hosts already loaded",
+                              self.blocked_file, len(self.blocked))
+                    self._stamp = stamp
+                    return
+                log.error("%s is missing or empty -- NO hosts are blocked "
+                          "(run bin/refresh_blocklists.py, check SAFEGUARD_DATA)", self.blocked_file)
             self.blocked = array("Q", seen)
             self.allowed = allowed
-            try:
-                self._mtime = os.path.getmtime(self.blocked_file)
-            except OSError:
-                self._mtime = -1.0
+            self._stamp = stamp
 
     def reload_if_changed(self) -> bool:
-        try:
-            mtime = os.path.getmtime(self.blocked_file)
-        except OSError:
-            return False
-        if mtime != self._mtime:
+        """Reload now if either data file changed.  Blocks for the load."""
+        if self._stat() != self._stamp:
             self.load()
             return True
         return False
+
+    def _maybe_reload(self) -> None:
+        """Cheap, throttled change check on the lookup path.
+
+        This is what makes the hot reload real: it does not depend on anything
+        polling /healthz.  The reload itself runs in a one-off thread, so the
+        request that noticed the change is answered from the current list
+        instead of waiting on several million hashes.
+        """
+        now = time.monotonic()
+        if now < self._next_check or self._reloading:
+            return
+        self._next_check = now + RELOAD_CHECK_SECONDS
+        if self._stat() == self._stamp:
+            return
+        self._reloading = True
+
+        def work() -> None:
+            try:
+                self.load()
+                log.info("blocklist reloaded: %d hosts", len(self.blocked))
+            except Exception:  # noqa: BLE001
+                log.exception("blocklist reload failed, keeping the current list")
+            finally:
+                self._reloading = False
+
+        threading.Thread(target=work, name="blocklist-reload", daemon=True).start()
 
     def __len__(self) -> int:
         return len(self.blocked)
@@ -134,6 +184,7 @@ class Blocklist:
         host = (host or "").strip().rstrip(".").lower()
         if not host:
             return None
+        self._maybe_reload()
         if host in self.allowed:
             return None
         for suffix in self._suffixes(host):

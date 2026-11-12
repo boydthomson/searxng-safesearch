@@ -144,7 +144,7 @@ categories:
       - '\bsex of (a|an|the|my)\b'
       - '\b(opposite|same|biological|third) sex\b'
       - '\bsex education\b'
-      - '\bmiddlesex|essex|sussex|wessex\b'
+      - '\b(middlesex|essex|sussex|wessex)\b'
       - '\b(water|gas|oil|roof|pipe|air|coolant|fuel|memory|data|news|information|intelligence|document) leaks?\b'
       - '\bleaks? (in|from|under|around) (the|my|a)\b'
       - '\b(fix|repair|stop|detect|find) (a |the )?leaks?\b'
@@ -220,7 +220,7 @@ categories:
       - '\bsex(ual)? (education|health|abuse (prevention|awareness|reporting|helpline))\b'
       - '\b(child|kid|kids|children) (safety|protection|abuse) (prevention|awareness|reporting|helpline|hotline|resources?)\b'
       - '\breport (child|csam|abuse)\b'
-      - '\bcybertip|\bmissing children\b'
+      - '\b(cybertip|missing children)\b'
     any:
       - '\b(child|kid|kids|minor|teen|preteen|underage|loli|lolita|shota|jailbait|toddler|infant|baby|schoolgirl|schoolboy|little girl|little boy|13yo|12yo|11yo|10yo|9yo|8yo)\b.{0,40}\b(porn|nude|naked|sex|xxx|erotic|hentai|cp|nudes|topless|undress|molest)\b'
       - '\b(porn|nude|naked|sex|xxx|erotic|hentai|nudes|topless|undress|molest|leaks?)\b.{0,40}\b(child|kid|kids|minor|preteen|underage|loli|shota|jailbait|toddler|infant|schoolgirl|schoolboy|little girl|little boy|13yo|12yo|11yo|10yo|9yo|8yo)\b'
@@ -248,7 +248,7 @@ categories:
       - '\b(nerf|water|foam|toy|lego|minecraft|fortnite|roblox|video game|paintball|airsoft|laser tag)\b'
       - '\b(history|world war|ww1|ww2|museum|civil war|medieval|knight|samurai|viking) \w*(weapon|sword|gun|cannon)\b'
       - '\bgun (control|laws?|violence statistics|safety course)\b'
-      - '\bvolcano|baking soda\b'
+      - '\b(volcano|baking soda)\b'
     any:
       - '\bghost ?(guns?|firearms?|pistols?|rifles?)\b'
       - '\bfgc ?9\b'
@@ -293,8 +293,8 @@ categories:
       - '\bice (cubes?|cream|rink|berg|bergs|skating|hockey|age|maker|machine|pack|storm|fishing)\b'
       - '\bcrystals?\b (growing|science|kit)\b'
       - '\bgrow(ing)? crystals\b'
-      - '\bdrug store|drugstore\b'
-      - '\bcanada\.ca|health canada|cdc|nih\b'
+      - '\b(drug store|drugstore)\b'
+      - '\b(canada\.ca|health canada|cdc|nih)\b'
     any:
       - '\b(buy|order|get|score|cop|where to (buy|get|find)|delivery|near me|for sale|cheap|online) (weed|marijuana|pot|cannabis|shrooms?|mushrooms?|lsd|acid|mdma|molly|ecstasy|coke|cocaine|crack|meth|heroin|fentanyl|ket(amine)?|xan(ax|nies)|percs?|oxy|adderall|vyvanse|dmt|steroids?)\b'
       - '\b(weed|marijuana|cannabis|shroom|mushroom|coke|cocaine|meth|heroin|mdma|lsd|xanax|oxy|fentanyl) (dealer|plug|delivery|same day|near me|for sale|no id|without (a )?(prescription|id))\b'
@@ -425,7 +425,7 @@ categories:
     label: Gambling
     safe:
       - '\b(addiction|problem gambling|help|responsible|statistics|odds of|probability|math|history of|age (limit|restriction))\b'
-      - '\bmonopoly|board game|game night|poker face\b'
+      - '\b(monopoly|board game|game night|poker face)\b'
     any:
       - '\b(online )?(casino|slots?|roulette|blackjack|baccarat|sportsbook|betting site)s?\b'
       - '\b(bet|betting|wager|gambl\w+) (online|real money|crypto|site|app|no kyc|without id)\b'
@@ -452,7 +452,7 @@ categories:
     label: Alcohol, tobacco and vapes
     safe:
       - '\b(dangers?|effects?|health risks?|quit|quitting|cessation|addiction|prevention|underage drinking (statistics|prevention)|law|legal age|history of)\b'
-      - '\bnon ?alcoholic|mocktail|root beer|ginger beer\b'
+      - '\b(non ?alcoholic|mocktail|root beer|ginger beer)\b'
     any:
       - '\b(buy|order|get|ship) (alcohol|beer|vodka|liquor|wine|cigarettes?|cigars?|vapes?|e ?cig\w*|nicotine|juul|zyn|snus)\b.{0,30}\b(no|without|skip|bypass) (id|age|verification|check|21|19|18)\b'
       - '\b(alcohol|cigarettes?|vapes?|nicotine|juul|zyn|tobacco) (no|without) (id|age (check|verification))\b'

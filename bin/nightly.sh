@@ -31,12 +31,19 @@ echo "===== $(date -Is) nightly start ====="
 # --- blocklist refresh: Sundays only (lists move slowly) --------------------
 if [ "$(date +%u)" = "7" ] || [ "${FORCE_REFRESH:-0}" = "1" ]; then
   before=$(sha256sum "$HOSTS_YML" 2>/dev/null | cut -d' ' -f1)
-  "$PY" bin/refresh_blocklists.py || echo "WARN refresh failed, keeping the previous list"
+  "$PY" bin/refresh_blocklists.py
+  refresh_rc=$?
+  case "$refresh_rc" in
+    0) ;;
+    3) echo "WARN refresh wrote the list, but at least one source had no fresh or cached copy" ;;
+    *) echo "RED: refresh refused to write (rc=$refresh_rc) -- keeping the previous list" ;;
+  esac
   after=$(sha256sum "$HOSTS_YML" 2>/dev/null | cut -d' ' -f1)
 
   if [ "$before" != "$after" ]; then
-    # The guard hot-reloads data/blocked-hosts.txt on its own; only SearXNG's
-    # curated regex list is read at start-up.
+    # The guard notices a changed data/blocked-hosts.txt or allowed-hosts.txt
+    # on its own within a minute (safeguard.blocklist); only SearXNG's curated
+    # regex list is read at start-up.
     echo "curated host list changed -- restarting searxng-safe"
     systemctl restart searxng-safe && sleep 20
   else

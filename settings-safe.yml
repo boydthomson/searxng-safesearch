@@ -4,6 +4,11 @@
 #
 # SearXNG binds loopback only -- the guard (safeguard.proxy) owns the public
 # port and proxies to it.
+#
+# Engine list: DuckDuckGo is left out on purpose -- its safe search proved
+# unreliable (it is not applied consistently server-side).  Wikimedia Commons
+# images are left out because Commons has no safe-search switch at all and
+# hosts explicit media.  Do not add either back.
 use_default_settings:
   engines:
     keep_only:
@@ -12,9 +17,7 @@ use_default_settings:
       - bing images
       - qwant images
       - brave.images
-      - wikicommons.images
       - google scholar
-      - duckduckgo
       - brave
       - mojeek
       - qwant
@@ -70,6 +73,10 @@ server:
   port: 8899
   bind_address: "127.0.0.1"
   secret_key: "CHANGE_ME_generate_with_openssl_rand_hex_32"
+  # The limiter stays off: it needs a Valkey instance, and clients arrive via
+  # the guard on loopback anyway.  The guard refuses json/csv/rss to anything
+  # but this machine (SAFEGUARD_JSON_CLIENTS), which is what stops the instance
+  # being scraped as a free API.
   limiter: false
   image_proxy: true
   public_instance: false
@@ -145,9 +152,6 @@ engines:
     disabled: false
   - name: bing
     disabled: false
-  - name: duckduckgo
-    disabled: false
-    weight: 1.5
   - name: brave
     disabled: false
     weight: 1.3
