@@ -379,7 +379,10 @@ def main() -> None:
     from waitress import serve  # noqa: PLC0415
 
     serve(app, host=os.environ.get("SAFEGUARD_BIND", "0.0.0.0"), port=int(os.environ.get("SAFEGUARD_PORT", "8889")),
-          threads=int(os.environ.get("SAFEGUARD_THREADS", "16")), ident="the child")
+          threads=int(os.environ.get("SAFEGUARD_THREADS", "16")), ident="the child",
+          # waitress strips X-Forwarded-* from untrusted peers by default, which
+          # would hide a same-host reverse proxy from _is_local()
+          clear_untrusted_proxy_headers=False)
 
 
 if __name__ == "__main__":
