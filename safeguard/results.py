@@ -18,7 +18,7 @@ __all__ = ["URL_FIELDS", "result_verdict"]
 # Every field of a SearXNG result that makes the browser, or the image proxy,
 # fetch something.  A clean page URL with a thumbnail from a blocked host is
 # still a picture from a blocked host.
-URL_FIELDS = ("url", "img_src", "thumbnail_src", "thumbnail", "iframe_src")
+URL_FIELDS = ("url", "img_src", "thumbnail_src", "thumbnail", "iframe_src", "audio_src", "magnetlink")
 
 
 def result_verdict(result: t.Mapping[str, t.Any]) -> str | None:
