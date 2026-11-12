@@ -5,10 +5,10 @@
 # SearXNG binds loopback only -- the guard (safeguard.proxy) owns the public
 # port and proxies to it.
 #
-# Engine list: DuckDuckGo is left out on purpose -- its safe search proved
-# unreliable (it is not applied consistently server-side).  Wikimedia Commons
-# images are left out because Commons has no safe-search switch at all and
-# hosts explicit media.  Do not add either back.
+# Engine list: Wikimedia Commons images are left out on purpose -- Commons has
+# no safe-search switch at all and hosts explicit media.  DuckDuckGo's safe
+# search is not fully reliable; it is kept for result coverage and its results
+# are still filtered by Layer 4.
 use_default_settings:
   engines:
     keep_only:
@@ -18,6 +18,7 @@ use_default_settings:
       - qwant images
       - brave.images
       - google scholar
+      - duckduckgo
       - brave
       - mojeek
       - qwant
@@ -152,6 +153,9 @@ engines:
     disabled: false
   - name: bing
     disabled: false
+  - name: duckduckgo
+    disabled: false
+    weight: 1.5
   - name: brave
     disabled: false
     weight: 1.3
