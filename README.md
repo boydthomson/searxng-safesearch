@@ -28,7 +28,8 @@ client ─▶ :8889 safesearch-guard ────────────▶ :88
 | `safeguard/blocklist.py` | 4.1M-host blocklist as a sorted array of 64-bit hashes (~65 MB resident, bisect lookup). |
 | `safeguard/pages.py` | Crisis interstitial and block page. |
 | `safeguard/proxy.py` | The L1/L2 guard (waitress + Flask), `systemd: safesearch-guard`. |
-| `searx/plugins/child_safety.py` | L4 result post-filter, installed into the SearXNG tree. |
+| `safeguard/results.py` | The L4 keep/drop decision for one result, shared by the plugin and the harness. |
+| `searx/plugins/child_safety.py` | L4 result post-filter. Copy or symlink it into the SearXNG tree (`searx/plugins/`); it imports `safeguard` from `SAFEGUARD_ROOT` (default `/opt/safesearch-guard`) and refuses to start without it or with an empty blocklist. |
 | `harness/` | Corpus generator, seed lexicon, acceptance runner, L3/L4 fixtures. |
 | `bin/` | Blocklist refresh, lexicon builders, CI gate, nightly job. |
 | `data/` | `curated-seed.txt` (hand-maintained), `allowed-hosts.txt`, generated `blocked-hosts.txt`, `sources.lock`. |
@@ -47,14 +48,22 @@ PY=/usr/local/searxng/searx-pyenv/bin/python
 bash bin/ci_gate.sh                 # rebuild everything + full 110k harness
 $PY bin/refresh_blocklists.py       # pull upstream lists, recompile
 $PY harness/run_harness.py --mode live --sample 1500   # hit the real instance
-curl -s localhost:8889/healthz      # blocklist size, lexicon version
+curl -s localhost:8889/healthz      # blocklist size, lexicon version (503 if the list is empty)
 curl -s localhost:8889/metricsz     # block counts by category (no queries logged)
 ```
+
+`/healthz` and `/metricsz` answer only a direct request from this machine. Through
+a reverse proxy, or from any other address, they return 404: the per-category
+counters are private. The same rule applies to `format=json|csv|rss`, so the
+instance cannot be scraped as an API; set `SAFEGUARD_JSON_CLIENTS=all` to lift it.
 
 **To block something new**: add the domain to `data/curated-seed.txt`, or the
 phrase to `harness/seeds.yml` under the right category, then run `bin/ci_gate.sh`.
 **To unblock a false positive**: add the host to `data/allowed-hosts.txt`, or a
-veto regex under that category's `safe:` in `safeguard/lexicons/categories.yml`.
+regex under that category's `safe:` in `safeguard/lexicons/categories.yml`. A
+`safe:` pattern excuses only the words it matches: `sex education` passes, but
+`porn sex education` is still judged on `porn`. Write the pattern so it covers
+the trigger word itself.
 
 ## Acceptance status
 
@@ -99,8 +108,8 @@ live run. Adding a genuinely new threat means adding a seed.
 Images are **on**; video is not. The brief allows images "routed only through
 engines that hard-enforce safe search", which is what this is:
 
-- only `google images`, `bing images`, `qwant images`, `brave.images` and
-  `wikicommons.images` are routed to the tab;
+- only `google images`, `bing images`, `qwant images` and `brave.images` are
+  routed to the tab (Wikimedia Commons has no safe-search switch and is out);
 - the guard applies an extra `images_strict` lexicon (`scope: images` in
   `categories.yml`) *on top of* the general one, so terms that are merely
   awkward as text are refused as pictures — `bikini`, `hot girls`,
@@ -155,15 +164,21 @@ points them at an adult.
   category lexicons themselves are English. A French-language porn query with no
   English tokens relies entirely on the hostname blocklist.
 - The upstream blocklists are third-party. `data/sources.lock` records the sha256
-  and entry count of each fetch, and the refresh refuses to shrink the compiled
-  list below the curated seed, but a poisoned upstream could still over-block.
+  and entry count of each fetch. A response that parses to less than half of the
+  cached copy is distrusted and the cache is used instead, and the refresh
+  refuses to write a list below 80% of the one on disk (`--force` overrides),
+  but a poisoned upstream could still over-block.
   `data/allowed-hosts.txt` is the escape hatch.
 
 ## Operations
 
 - `systemd`: `safesearch-guard.service` (public :8889) and `searxng-safe.service`
-  (loopback :8899). The guard hot-reloads the compiled blocklist; SearXNG reads
-  its curated regex list at start-up and needs a restart.
+  (loopback :8899). The guard and the L4 plugin notice a changed
+  `blocked-hosts.txt` or `allowed-hosts.txt` on their own within about 30 s
+  (`SAFEGUARD_RELOAD_CHECK`) and never swap a loaded list for an empty one;
+  SearXNG reads its curated regex list at start-up and needs a restart. The
+  guard exits at start-up if the compiled blocklist is missing or empty.
+  `SAFEGUARD_BIND` sets the listen address (default `0.0.0.0`).
 - `cron.d/safesearch-guard`: 03:17 nightly. Tuned to be cheap on everything
   external:
   - **offline gate every night** — 110k terms, ~80 s of local CPU, no network.

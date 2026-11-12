@@ -9,6 +9,12 @@ Outputs:
                                     ``hostnames`` plugin (independent Layer 3)
 
 Run with --offline to recompile from the curated seed only (no network).
+
+Exit status:
+  0  list written, every source accounted for (fresh or cached)
+  1  refused to write: the result is implausibly small (see --force)
+  3  list written, but at least one source had neither a usable response nor
+     a cached copy, so its hosts are missing
 """
 
 from __future__ import annotations
@@ -79,6 +85,25 @@ def read_local(path: str) -> set[str]:
         return parse_hosts(fh.read())
 
 
+# Refuse to write a list that lost more than this share of the previous one.
+MIN_KEEP = 0.8
+
+
+def previous_count(path: str) -> int:
+    """Entry count of the compiled list currently on disk (0 if there is none)."""
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as fh:
+            for _ in range(8):
+                line = fh.readline()
+                if line.startswith("# entries:"):
+                    return int(line.split(":", 1)[1].strip())
+                if not line.startswith("#"):
+                    break
+    except (OSError, ValueError):
+        pass
+    return 0
+
+
 def atomic_write(path: str, text: str) -> None:
     d = os.path.dirname(path) or "."
     os.makedirs(d, exist_ok=True)
@@ -98,6 +123,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true", help="skip network sources")
     ap.add_argument("--timeout", type=float, default=60.0)
+    ap.add_argument("--force", action="store_true",
+                    help="write even if the list shrank sharply against the previous one")
     args = ap.parse_args()
 
     os.makedirs(CACHE, exist_ok=True)
@@ -105,6 +132,13 @@ def main() -> int:
     allowed = read_local(ALLOWED) | HARD_ALLOW
     blocked = set(seed)
     lock_lines = [f"seed\tlocal\t{len(seed)}"]
+    missing = 0   # sources with no usable response and no cache
+
+    def cached_hosts(body_path: str) -> set[str] | None:
+        if not os.path.exists(body_path):
+            return None
+        with open(body_path, "r", encoding="utf-8", errors="replace") as fh:
+            return parse_hosts(fh.read())
 
     if not args.offline:
         with httpx.Client(timeout=args.timeout, follow_redirects=True,
@@ -136,19 +170,31 @@ def main() -> int:
                     resp.raise_for_status()
                 except Exception as exc:  # noqa: BLE001
                     print(f"WARN  {category} {url}: {exc}", file=sys.stderr)
-                    if os.path.exists(body_path):
-                        with open(body_path, "r", encoding="utf-8", errors="replace") as fh:
-                            hosts = parse_hosts(fh.read())
+                    hosts = cached_hosts(body_path)
+                    if hosts is not None:
                         blocked |= hosts
                         lock_lines.append(f"{category}\t{url}\tFAILED(using cache, {len(hosts)})")
                         print(f"WARN  {category}: using cached copy ({len(hosts)} hosts)", file=sys.stderr)
                     else:
+                        missing += 1
                         lock_lines.append(f"{category}\t{url}\tFAILED")
                     continue
                 hosts = parse_hosts(resp.text)
-                if len(hosts) < 50:
-                    print(f"WARN  {category} {url}: only {len(hosts)} hosts, ignoring", file=sys.stderr)
-                    lock_lines.append(f"{category}\t{url}\tSUSPECT({len(hosts)})")
+                # A 200 with a truncated or empty body must not replace a good
+                # copy: fall back to the cache instead of dropping the source.
+                previous = cached_hosts(body_path)
+                floor = max(50, len(previous) // 2) if previous else 50
+                if len(hosts) < floor:
+                    print(f"WARN  {category} {url}: only {len(hosts)} hosts "
+                          f"(expected at least {floor}), not trusting it", file=sys.stderr)
+                    if previous:
+                        blocked |= previous
+                        lock_lines.append(
+                            f"{category}\t{url}\tSUSPECT({len(hosts)}, using cache, {len(previous)})")
+                        print(f"WARN  {category}: using cached copy ({len(previous)} hosts)", file=sys.stderr)
+                    else:
+                        missing += 1
+                        lock_lines.append(f"{category}\t{url}\tSUSPECT({len(hosts)})")
                     continue
                 digest = hashlib.sha256(resp.content).hexdigest()[:16]
                 atomic_write(body_path, resp.text)
@@ -166,6 +212,15 @@ def main() -> int:
 
     if len(blocked) < len(seed):
         print("ERROR: compiled list smaller than the seed, refusing to write", file=sys.stderr)
+        return 1
+
+    # The seed is ~230 hosts and the full list is millions, so "not smaller
+    # than the seed" guards nothing.  Compare against what is deployed now.
+    before = previous_count(OUT)
+    if before and len(blocked) < before * MIN_KEEP and not args.force:
+        print(f"ERROR: compiled list would shrink from {before} to {len(blocked)} hosts "
+              f"(below {MIN_KEEP:.0%}); refusing to write.  Re-run with --force if this is intended.",
+              file=sys.stderr)
         return 1
 
     header = (
@@ -186,12 +241,16 @@ def main() -> int:
            ""]
     for host in curated:
         escaped = host.replace(".", r"\.")
-        yml.append(f"- '(.*\\.)?{escaped}$'")
+        yml.append(f"- '^(.*\\.)?{escaped}$'")
     try:
         atomic_write(HOSTNAMES_YML, "\n".join(yml) + "\n")
         print(f"wrote {HOSTNAMES_YML}: {len(curated)} patterns")
     except OSError as exc:
         print(f"WARN  could not write {HOSTNAMES_YML}: {exc}", file=sys.stderr)
+    if missing:
+        print(f"WARN  {missing} source(s) had no usable response and no cache; "
+              "their hosts are not in the list", file=sys.stderr)
+        return 3
     return 0
 
 

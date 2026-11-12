@@ -62,7 +62,9 @@ NO_HIT = Verdict(hit=False)
 # Domains whose results are never dropped by the lexicon pass (they can still be
 # dropped by an explicit blocklist entry).  Keeps the benign control set green.
 DEFAULT_ALLOW_SUFFIXES = (
-    "wikipedia.org", "wikimedia.org", "wikidata.org", "wiktionary.org",
+    # wikimedia.org is deliberately absent: Commons hosts explicit anatomical
+    # and nude media, so its results are scored like any other site's.
+    "wikipedia.org", "wikidata.org", "wiktionary.org",
     "britannica.com", "nationalgeographic.com", "natgeokids.com",
     "khanacademy.org", "nasa.gov", "noaa.gov", "si.edu", "ushmm.org",
     "canada.ca", "gc.ca", "who.int", "cdc.gov", "nih.gov", "nhs.uk",
@@ -73,6 +75,12 @@ DEFAULT_ALLOW_SUFFIXES = (
     "ducksters.com", "kids.nationalgeographic.com", "coolmath4kids.com",
     "scholastic.com", "pbskids.org", "britishcouncil.org",
 )
+
+
+# What a ``safe`` match is replaced with.  Not a word character, so ``\b``
+# still falls on either side of it, and not a letter any lexicon uses.
+_MASK = " | "
+_MASK_WS_RE = re.compile(r"\s+")
 
 
 def _compile(patterns: t.Iterable[str]) -> list[re.Pattern[str]]:
@@ -120,11 +128,37 @@ class Classifier:
                         self.phrases.add(cat_id, str(phrase).lower())
 
     # ------------------------------------------------------------------ core
+    @staticmethod
+    def _masked(cat: Category, forms: list[str]) -> list[str] | None:
+        """``forms`` with every ``safe`` match cut out, or ``None`` if none matched.
+
+        A ``safe`` pattern excuses the words it matches and nothing else.  It
+        used to veto the whole category for the whole query, so tacking a safe
+        phrase onto anything ("... sex education", "... suicide squad",
+        "... minecraft") switched the category off, crisis page included.  Now
+        the safe span is removed and whatever is left is classified as usual:
+        "sex education" leaves nothing and passes, "porn sex education" leaves
+        "porn" and is blocked.
+        """
+        out: list[str] = []
+        for f in forms:
+            hit = False
+            for rx in cat.safe:
+                f, n = rx.subn(_MASK, f)
+                hit = hit or bool(n)
+            if not hit:
+                # ``forms`` are spellings of one query.  Where the safe phrase
+                # is recognisable only after normalisation ("sex chromsomes",
+                # "w_e_e_d_s"), the raw spelling still holds the excused words
+                # unmasked; judging it would undo the excuse.  The rest of the
+                # query is present in the masked spellings too.
+                continue
+            f = _MASK_WS_RE.sub(" ", f).strip()
+            if f not in out:
+                out.append(f)
+        return out or None
+
     def _match(self, cat: Category, forms: list[str], squeezed: str) -> str | None:
-        for rx in cat.safe:
-            for f in forms:
-                if rx.search(f):
-                    return None
         for rx in cat.any:
             for f in forms:
                 if rx.search(f):
@@ -161,16 +195,22 @@ class Classifier:
                 extra += fixed.replace(" ", "") + " "
         squeezed += extra
 
-        vetoed: set[str] = set()
+        # Categories with a ``safe`` match are judged on what is left of the
+        # query once the safe spans are removed (see ``_masked``).
+        masked: dict[str, list[str]] = {}
         for cat in self.categories:
             if only is not None and cat.id not in only:
                 continue
             if cat.scope not in scopes:
                 continue
-            if any(rx.search(f) for rx in cat.safe for f in forms):
-                vetoed.add(cat.id)
-                continue
-            reason = self._match(cat, forms, squeezed)
+            rest = self._masked(cat, forms)
+            if rest is None:
+                reason = self._match(cat, forms, squeezed)
+            else:
+                masked[cat.id] = rest
+                # the mask is kept in the squeezed form so that the words on
+                # either side of a removed span cannot fuse into a new token
+                reason = self._match(cat, rest, " ".join(f.replace(" ", "") for f in rest))
             if reason:
                 return Verdict(True, cat.id, cat.tier, cat.action, cat.label, reason)
 
@@ -179,9 +219,19 @@ class Classifier:
         for f in forms:
             tokens.update(f.split())
         wanted = {c.id for c in self.categories
-                  if c.id not in vetoed and c.scope in scopes
+                  if c.id not in masked and c.scope in scopes
                   and (only is None or c.id in only)}
         hit = self.phrases.match(tokens, owners=wanted)
+        if not hit:
+            for cat in self.categories:
+                if cat.id not in masked:
+                    continue
+                rest_tokens: set[str] = set()
+                for f in masked[cat.id]:
+                    rest_tokens.update(tok for tok in f.split() if tok != _MASK.strip())
+                hit = self.phrases.match(rest_tokens, owners={cat.id})
+                if hit:
+                    break
         if hit:
             cat = self.by_id[hit[0]]
             return Verdict(True, cat.id, cat.tier, cat.action, cat.label, f"fuzzy:{hit[1]}")
